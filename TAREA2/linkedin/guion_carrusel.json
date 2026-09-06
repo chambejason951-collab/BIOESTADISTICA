@@ -1,0 +1,306 @@
+{
+  "dimensiones": "1920 x 1080 px",
+  "proporcion": "16:9",
+  "paginas": [
+    {
+      "pagina": 1,
+      "tipo": "portada",
+      "titulo": "Tamaño de muestra en R"
+    },
+    {
+      "pagina": 2,
+      "caso": "E1A",
+      "tipo": "planteamiento",
+      "titulo": "Hemoglobina: una media frente a referencia"
+    },
+    {
+      "pagina": 3,
+      "caso": "E1A",
+      "tipo": "calculo",
+      "n": 3,
+      "N_total": 3,
+      "titulo": "Del código al tamaño que reportamos"
+    },
+    {
+      "pagina": 4,
+      "caso": "E1B",
+      "tipo": "planteamiento",
+      "titulo": "La dirección se decide antes de medir"
+    },
+    {
+      "pagina": 5,
+      "caso": "E1B",
+      "tipo": "calculo",
+      "n": 3,
+      "N_total": 3,
+      "titulo": "Del código al tamaño que reportamos"
+    },
+    {
+      "pagina": 6,
+      "caso": "E1C",
+      "tipo": "planteamiento",
+      "titulo": "Una diferencia menor necesita más muestra"
+    },
+    {
+      "pagina": 7,
+      "caso": "E1C",
+      "tipo": "calculo",
+      "n": 10,
+      "N_total": 10,
+      "titulo": "Del código al tamaño que reportamos"
+    },
+    {
+      "pagina": 8,
+      "caso": "E2A",
+      "tipo": "planteamiento",
+      "titulo": "Anemia: una proporción frente a referencia"
+    },
+    {
+      "pagina": 9,
+      "caso": "E2A",
+      "tipo": "calculo",
+      "n": 41,
+      "N_total": 41,
+      "titulo": "Del código al tamaño que reportamos"
+    },
+    {
+      "pagina": 10,
+      "caso": "E2B",
+      "tipo": "planteamiento",
+      "titulo": "Una hipótesis de disminución"
+    },
+    {
+      "pagina": 11,
+      "caso": "E2B",
+      "tipo": "calculo",
+      "n": 32,
+      "N_total": 32,
+      "titulo": "Del código al tamaño que reportamos"
+    },
+    {
+      "pagina": 12,
+      "caso": "E2C",
+      "tipo": "planteamiento",
+      "titulo": "Detectar una reducción más discreta"
+    },
+    {
+      "pagina": 13,
+      "caso": "E2C",
+      "tipo": "calculo",
+      "n": 178,
+      "N_total": 178,
+      "titulo": "Del código al tamaño que reportamos"
+    },
+    {
+      "pagina": 14,
+      "caso": "E4A",
+      "tipo": "planteamiento",
+      "titulo": "Dos distritos, dos muestras independientes"
+    },
+    {
+      "pagina": 15,
+      "caso": "E4A",
+      "tipo": "calculo",
+      "n": 121,
+      "N_total": 242,
+      "titulo": "Del código al tamaño que reportamos"
+    },
+    {
+      "pagina": 16,
+      "caso": "E4B",
+      "tipo": "planteamiento",
+      "titulo": "Más potencia exige más participantes"
+    },
+    {
+      "pagina": 17,
+      "caso": "E4B",
+      "tipo": "calculo",
+      "n": 162,
+      "N_total": 324,
+      "titulo": "Del código al tamaño que reportamos"
+    },
+    {
+      "pagina": 18,
+      "caso": "E4C",
+      "tipo": "planteamiento",
+      "titulo": "Prevalencias más cercanas cuestan distinguir"
+    },
+    {
+      "pagina": 19,
+      "caso": "E4C",
+      "tipo": "calculo",
+      "n": 369,
+      "N_total": 738,
+      "titulo": "Del código al tamaño que reportamos"
+    },
+    {
+      "pagina": 20,
+      "tipo": "cierre",
+      "titulo": "La muestra depende de la pregunta"
+    }
+  ],
+  "variantes": {
+    "E1A": {
+      "title": "Hemoglobina: una media frente a referencia",
+      "short": "Puno · Variante A · Bilateral",
+      "question": "Después de la intervención esperamos una media de 14 g/dL. ¿Cuántos niños necesitamos para compararla con 10 g/dL?",
+      "math": "$10\\ \\mathrm{g/dL}\\ \\longrightarrow\\ 14\\ \\mathrm{g/dL}$",
+      "inputs": [
+        "Referencia fija: 10 g/dL",
+        "DE esperada: 1 g/dL",
+        "Alfa: 0,05 · Potencia: 80 %",
+        "Alternativa: bilateral"
+      ],
+      "hyp": "$H_0:\\mu=10\\qquad H_A:\\mu\\ne10$",
+      "reason": "Hay una muestra nueva. La referencia de 10 se considera fija, sin incertidumbre muestral.",
+      "take": "El tamaño pequeño se explica por d = 4. Depende de normalidad y de una DE bien sustentada.",
+      "calc": "$d=(14-10)/1=4$",
+      "caption": "niños en una muestra",
+      "source": "Teoría 01, pp. 7 y 29 · Teoría 02, pp. 9 y 11 · Teoría 03, pp. 30 y 31"
+    },
+    "E1B": {
+      "title": "La dirección se decide antes de medir",
+      "short": "Puno · Variante B · Incremento",
+      "question": "Con los mismos valores de hemoglobina, ahora planteamos formalmente una hipótesis unilateral de incremento.",
+      "math": "$10\\ \\mathrm{g/dL}\\ \\longrightarrow\\ 14\\ \\mathrm{g/dL}$",
+      "inputs": [
+        "Referencia fija: 10 g/dL",
+        "DE esperada: 1 g/dL",
+        "Alfa: 0,05 · Potencia: 80 %",
+        "Alternativa: mayor que 10"
+      ],
+      "hyp": "$H_0:\\mu\\le10\\qquad H_A:\\mu>10$",
+      "reason": "Seguimos comparando una muestra con una referencia. Cambia la dirección del contraste.",
+      "take": "El n sin redondear disminuye, pero ambas variantes terminan en 3. Una cola no siempre cambia el entero.",
+      "calc": "$d=4\\qquad \\mathrm{alternative}=\\texttt{greater}$",
+      "caption": "niños en una muestra",
+      "source": "Teoría 01, p. 7 · Teoría 02, pp. 9 y 11 · Teoría 03, pp. 18 y 19"
+    },
+    "E1C": {
+      "title": "Una diferencia menor necesita más muestra",
+      "short": "Puno · Variante C · Menor incremento",
+      "question": "Ahora esperamos 11 g/dL en lugar de 14. Mantenemos la referencia, la DE, el alfa y la potencia del caso bilateral.",
+      "math": "$10\\ \\mathrm{g/dL}\\ \\longrightarrow\\ 11\\ \\mathrm{g/dL}$",
+      "inputs": [
+        "Referencia fija: 10 g/dL",
+        "DE esperada: 1 g/dL",
+        "Alfa: 0,05 · Potencia: 80 %",
+        "Alternativa: bilateral"
+      ],
+      "hyp": "$H_0:\\mu=10\\qquad H_A:\\mu\\ne10$",
+      "reason": "La comparación sigue siendo de una muestra. Cambia la diferencia que queremos detectar.",
+      "take": "El efecto baja de d = 4 a d = 1. Con los demás supuestos iguales, la muestra aumenta de 3 a 10.",
+      "calc": "$d=(11-10)/1=1$",
+      "caption": "niños en una muestra",
+      "source": "Teoría 01, p. 7 · Teoría 02, pp. 9 y 11 · Teoría 03, pp. 15 y 19"
+    },
+    "E2A": {
+      "title": "Anemia: una proporción frente a referencia",
+      "short": "Juliaca · Variante A · Bilateral",
+      "question": "Esperamos una prevalencia posterior de 20 %. Para este cálculo tratamos el 40 % previo como referencia fija.",
+      "math": "$40\\,\\%\\ \\longrightarrow\\ 20\\,\\%$",
+      "inputs": [
+        "Desenlace: anemia sí/no",
+        "Referencia fija: 40 %",
+        "Alfa: 0,05 · Potencia: 80 %",
+        "Alternativa: bilateral"
+      ],
+      "hyp": "$H_0:p=0{,}40\\qquad H_A:p\\ne0{,}40$",
+      "reason": "Se mide prevalencia en una muestra nueva. Una comparación histórica no demuestra por sí sola causalidad.",
+      "take": "40 % a 20 % son 20 puntos porcentuales de reducción. El n corresponde a una sola muestra.",
+      "calc": "$h=2\\arcsin\\sqrt{0{,}20}-2\\arcsin\\sqrt{0{,}40}$",
+      "caption": "niños en una muestra",
+      "source": "Teoría 01, pp. 47 y 50 · Teoría 02, pp. 9 y 11 · Teoría 03, pp. 32 y 33"
+    },
+    "E2B": {
+      "title": "Una hipótesis de disminución",
+      "short": "Juliaca · Variante B · Unilateral",
+      "question": "Se mantienen 40 % y 20 %, pero se plantea antes del estudio que el contraste evaluará una disminución.",
+      "math": "$40\\,\\%\\ \\longrightarrow\\ 20\\,\\%$",
+      "inputs": [
+        "Desenlace: anemia sí/no",
+        "Referencia fija: 40 %",
+        "Alfa: 0,05 · Potencia: 80 %",
+        "Alternativa: menor que 40 %"
+      ],
+      "hyp": "$H_0:p\\ge0{,}40\\qquad H_A:p<0{,}40$",
+      "reason": "La comparación sigue siendo de una proporción. La hipótesis direccional debe estar justificada de antemano.",
+      "take": "Conserva h negativo y usa less. Cambiar a una cola después de ver los datos no es una justificación válida.",
+      "calc": "$h=-0{,}442143\\qquad\\mathrm{alternative}=\\texttt{less}$",
+      "caption": "niños en una muestra",
+      "source": "Teoría 01, p. 47 · Teoría 02, pp. 9 y 11 · Teoría 03, pp. 18 y 19"
+    },
+    "E2C": {
+      "title": "Detectar una reducción más discreta",
+      "short": "Juliaca · Variante C · Menor diferencia",
+      "question": "Ahora se espera pasar de 40 % a 30 %. Conservamos el contraste bilateral, alfa de 0,05 y potencia de 80 %.",
+      "math": "$40\\,\\%\\ \\longrightarrow\\ 30\\,\\%$",
+      "inputs": [
+        "Desenlace: anemia sí/no",
+        "Referencia fija: 40 %",
+        "Alfa: 0,05 · Potencia: 80 %",
+        "Alternativa: bilateral"
+      ],
+      "hyp": "$H_0:p=0{,}40\\qquad H_A:p\\ne0{,}40$",
+      "reason": "Mantenemos una muestra contra referencia. Solo cambia la prevalencia que esperamos detectar.",
+      "take": "Al reducir la diferencia de 20 a 10 puntos porcentuales, la muestra aumenta de 41 a 178 niños.",
+      "calc": "$h=2\\arcsin\\sqrt{0{,}30}-2\\arcsin\\sqrt{0{,}40}$",
+      "caption": "niños en una muestra",
+      "source": "Teoría 01, pp. 47 y 50 · Teoría 02, p. 11 · Teoría 03, pp. 15 y 19"
+    },
+    "E4A": {
+      "title": "Dos distritos, dos muestras independientes",
+      "short": "SJL y VMT · Variante A · Potencia de 80 %",
+      "question": "Comparemos 43 % de prevalencia en San Juan de Lurigancho y 26 % en Villa María del Triunfo.",
+      "math": "$43\\,\\%\\quad\\mathrm{vs.}\\quad26\\,\\%$",
+      "inputs": [
+        "Niños distintos por distrito",
+        "Asignación de muestra: 1:1",
+        "Alfa: 0,05 · Potencia: 80 %",
+        "Alternativa: bilateral"
+      ],
+      "hyp": "$H_0:p_{SJL}=p_{VMT}\\quad H_A:p_{SJL}\\ne p_{VMT}$",
+      "reason": "Es una comparación transversal observacional. Aquí ambas prevalencias se estimarán mediante muestras.",
+      "take": "pwr.2p.test devuelve n por distrito: 121 + 121 = 242 niños. No confundas n con el total.",
+      "calc": "$h=2\\arcsin\\sqrt{0{,}43}-2\\arcsin\\sqrt{0{,}26}$",
+      "caption": "niños por distrito",
+      "source": "Teoría 01, pp. 29 y 47 · Teoría 02, p. 7 · Teoría 03, pp. 36 y 37"
+    },
+    "E4B": {
+      "title": "Más potencia exige más participantes",
+      "short": "SJL y VMT · Variante B · Potencia de 90 %",
+      "question": "Mantenemos las prevalencias de 43 % y 26 %, pero exigimos una potencia de 90 % para la diferencia prevista.",
+      "math": "$43\\,\\%\\quad\\mathrm{vs.}\\quad26\\,\\%$",
+      "inputs": [
+        "Muestras independientes",
+        "Asignación de muestra: 1:1",
+        "Alfa: 0,05 · Potencia: 90 %",
+        "Alternativa: bilateral"
+      ],
+      "hyp": "$H_0:p_{SJL}=p_{VMT}\\quad H_A:p_{SJL}\\ne p_{VMT}$",
+      "reason": "El diseño y el efecto permanecen iguales. Queremos reducir beta de 20 % a 10 % bajo esa alternativa.",
+      "take": "La muestra aumenta de 121 a 162 por distrito. Potencia no significa probabilidad de que exista un efecto.",
+      "calc": "$h=0{,}360193\\qquad 1-\\beta=0{,}90$",
+      "caption": "niños por distrito",
+      "source": "Teoría 01, p. 47 · Teoría 02, p. 7 · Teoría 03, pp. 11 y 14"
+    },
+    "E4C": {
+      "title": "Prevalencias más cercanas cuestan distinguir",
+      "short": "SJL y VMT · Variante C · Menor diferencia",
+      "question": "Comparamos ahora 43 % y 33 %, con potencia de 80 %, alfa de 0,05 y dos muestras de igual tamaño.",
+      "math": "$43\\,\\%\\quad\\mathrm{vs.}\\quad33\\,\\%$",
+      "inputs": [
+        "Muestras independientes",
+        "Asignación de muestra: 1:1",
+        "Alfa: 0,05 · Potencia: 80 %",
+        "Alternativa: bilateral"
+      ],
+      "hyp": "$H_0:p_{SJL}=p_{VMT}\\quad H_A:p_{SJL}\\ne p_{VMT}$",
+      "reason": "La diferencia se reduce de 17 a 10 puntos porcentuales. La comparación sigue siendo observacional.",
+      "take": "El resultado es 369 por distrito, 738 en total. El tamaño de muestra no elimina la confusión entre poblaciones.",
+      "calc": "$h=2\\arcsin\\sqrt{0{,}43}-2\\arcsin\\sqrt{0{,}33}$",
+      "caption": "niños por distrito",
+      "source": "Teoría 01, pp. 24 y 47 · Teoría 02, p. 7 · Teoría 03, pp. 15 y 19"
+    }
+  }
+}
