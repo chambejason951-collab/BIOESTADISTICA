@@ -1,0 +1,8 @@
+project:
+  type: default
+  execute-dir: project
+  render:
+    - practica/practica_tamano_muestra.qmd
+    - tutorial/tutorial_tamano_muestra.qmd
+
+lang: es

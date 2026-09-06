@@ -1,0 +1,16 @@
+.quarto/
+.Rhistory
+.RData
+.DS_Store
+temporal/
+*.aux
+*.log
+*.out
+*.fls
+*.fdb_latexmk
+*.synctex.gz
+*.knit.md
+*_files/
+auditoria/tutorial_enviado_a_strive.tex
+auditoria/manifest_publicacion.json
+ENTREGA_TAREA2.zip
