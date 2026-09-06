@@ -1,0 +1,926 @@
+\documentclass[10pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[spanish,es-nodecimaldot]{babel}
+\usepackage{lmodern,amsmath,amssymb,geometry,xcolor,booktabs,tabularx,longtable,fancyhdr,fancyvrb,titlesec,hyperref}
+\geometry{left=19mm,right=19mm,top=20mm,bottom=19mm}
+\definecolor{Navy}{HTML}{102A43}
+\definecolor{Blue}{HTML}{2563EB}
+\definecolor{Gray}{HTML}{52606D}
+\definecolor{Pale}{HTML}{F3F6FA}
+\hypersetup{colorlinks=true,linkcolor=Navy,urlcolor=Blue,pdftitle={Tamaño de muestra en R},pdfauthor={Jason Chambe}}
+\pagestyle{fancy}\fancyhf{}
+\fancyhead[L]{\small\color{Gray}BIOESTADÍSTICA \quad / \quad TAREA 2}
+\fancyhead[R]{\small\color{Gray}Jason Chambe}
+\fancyfoot[L]{\footnotesize\color{Gray}Diseño, supuestos, cálculo e interpretación}
+\fancyfoot[R]{\footnotesize\color{Navy}\thepage}
+\setlength{\headheight}{14pt}
+\setlength{\parindent}{0pt}\setlength{\parskip}{5pt}
+\titleformat{\section}{\Large\bfseries\color{Navy}}{}{0pt}{}
+\titleformat{\subsection}{\large\bfseries\color{Blue}}{}{0pt}{}
+\titlespacing*{\section}{0pt}{5pt}{9pt}
+\titlespacing*{\subsection}{0pt}{6pt}{4pt}
+\renewcommand{\arraystretch}{1.2}
+\setlength{\tabcolsep}{2.5pt}
+\newcommand{\etiqueta}[1]{\par{\bfseries\color{Blue}#1}\par}
+\newcommand{\cajares}[1]{\par\colorbox{Pale}{\parbox{\dimexpr\linewidth-2\fboxsep}{\vspace{4pt}\textbf{\color{Navy}#1}\vspace{4pt}}}\par}
+\fvset{fontsize=\footnotesize,frame=single,rulecolor=\color{Blue},framesep=5pt}
+\emergencystretch=2em
+\begin{document}
+\begin{titlepage}
+{\color{Blue}\large BIOESTADÍSTICA \quad / \quad TAREA 2}
+\vspace*{27mm}
+
+{\color{Navy}\fontsize{35}{41}\selectfont\bfseries Tamaño de muestra\\en R\par}
+\vspace{8mm}
+{\color{Gray}\fontsize{20}{26}\selectfont Del diseño a la interpretación\par}
+\vspace{13mm}
+{\color{Blue}\Large 3 ejercicios centrales · 9 variantes resueltas\par}
+\vspace{4mm}
+{\large Práctica ampliada: 8 escenarios y 24 variantes\par}
+\vspace{13mm}
+\hrule
+\vspace{6mm}
+\begin{minipage}{0.88\linewidth}
+Este tutorial muestra cómo justificar el método, declarar los supuestos, calcular en R y explicar qué representa la muestra obtenida. Cada variante cambia una decisión concreta para comprender su efecto.
+\end{minipage}
+\vfill
+{\Large\bfseries Jason Chambe\par}
+{\color{Gray}6 de septiembre de 2026\par}
+\vspace{5mm}
+Adaptación didáctica de las presentaciones Teoría 01, 02 y 03 y de \texttt{Muestra.qmd}, de Antonio M. Quispe. Los contextos y variantes añadidos son ejercicios de planificación, no resultados observados.
+\end{titlepage}
+\subsection*{Antes de calcular: definir qué se compara}
+
+Un tamaño de muestra solo tiene sentido respecto de una pregunta, un diseño y un análisis. Decir «después de una intervención» no determina si hay una referencia fija, dos muestras independientes o los mismos participantes medidos dos veces. Teoría 01 sitúa población, unidad y diseño antes de la inferencia; Teoría 02 explica por qué la asignación y los comparadores importan para interpretar un cambio. [1, pp. 7 y 29; 2, pp. 7 a 12]
+
+Los tres ejercicios centrales son hemoglobina en Puno, anemia en Juliaca y comparación de anemia entre dos distritos. Se conservan los identificadores E1, E2 y E4 de la práctica. Los otros cinco escenarios completan 24 variantes en el anexo. Cada caso incluye enunciado, fundamento, hipótesis, cálculo, código, interpretación y una pregunta de comprensión.
+
+\begingroup\small\begin{longtable}{@{}p{54.0mm}p{54.0mm}p{54.0mm}@{}}\toprule
+Comparación & Función & Significado de n\\\midrule
+Una media contra referencia & pwr.t.test, one.sample & Personas\\
+Una proporción contra referencia & pwr.p.test & Personas\\
+Dos medias independientes & pwr.t.test, two.sample & Personas por grupo\\
+Dos proporciones independientes & pwr.2p.test & Personas por grupo\\
+Medias pareadas & pwr.t.test, paired & Pares completos\\
+Tres o más medias independientes & pwr.anova.test o power.anova.test & Personas por grupo\\
+Factorial 2 \ensuremath{\times} 2, modelo aditivo & ss.2way y pwr.2way & Personas por celda\\
+\bottomrule\end{longtable}\endgroup
+
+La selección sigue el desenlace y la estructura de las observaciones. Las funciones de R especifican qué representa n. [3, p. 26; 5 a 7]
+
+\subsection*{Supuestos que deben quedar escritos}
+
+Se usa alfa de 0,05 y potencia de 80 \%, salvo las variantes que elevan esta última a 90 \%. El caso base conserva la comparación bilateral de clase. Las variantes unilaterales declaran su dirección antes de analizar datos. Se supone muestreo individual y observaciones independientes, excepto las dos mediciones dentro de cada par. No se incluyen pérdidas, rechazo, corrección por población finita ni muestreo por conglomerados.
+
+Los enunciados originales no fijan todos estos elementos. Los tamaños de este tutorial son respuestas condicionadas a los supuestos declarados. En los ejercicios E1 y E2, 10 g/dL y 40 \% son referencias fijas sin incertidumbre muestral. Si proceden de mediciones basales estimadas, se debe replantear el cálculo.
+
+\clearpage
+\subsection*{Entender el cálculo}
+
+Alfa es el nivel de error tipo I planificado. Potencia es la probabilidad de rechazar la hipótesis nula si la alternativa concreta usada para planificar fuera verdadera y el modelo fuera adecuado. Una potencia de 80 \% no expresa la probabilidad de que exista un efecto ni garantiza significación en un estudio concreto. [3, pp. 11 a 19]
+
+Para una media, d = (media esperada \ensuremath{-} referencia) / DE. Para datos pareados se usa la DE de las diferencias. Una diferencia menor o una DE mayor reduce el efecto estandarizado y suele exigir más muestra. d, h y f son tamaños del efecto; no son el efecto de diseño por conglomerados, DEFF.
+
+Para proporciones, h = 2 asin(\ensuremath{\surd}p1) \ensuremath{-} 2 asin(\ensuremath{\surd}p0). Las proporciones se ingresan entre 0 y 1. Pasar de 40 \% a 20 \% representa 20 puntos porcentuales de reducción absoluta y 50 \% de reducción relativa. En una alternativa unilateral se conserva el signo de h. El método de proporciones usado aquí es una aproximación de arcoseno, no una prueba binomial exacta. [3, pp. 32 a 37; 5]
+
+Estos ejercicios planifican contrastes con potencia. Estimar una prevalencia con margen de error e es otra pregunta; la aproximación simple es n = z\ensuremath{^2} p(1 \ensuremath{-} p) / e\ensuremath{^2}, usando el cuantil correspondiente al nivel de confianza. No se fija una potencia para una alternativa cuando solo se solicita precisión. [3, p. 21]
+
+Se aplica ceiling() al tamaño por grupo antes de calcular el total: N = 2n para dos grupos, N = 3n para tres, N = 4n para cuatro celdas. En un análisis pareado, n pares corresponden a n personas medidas dos veces.
+
+Se verificó numéricamente la potencia en n y en n \ensuremath{-} 1 para las 24 variantes. En cada caso n alcanza el objetivo y n \ensuremath{-} 1 no, bajo la función utilizada. Esta comprobación no demuestra que los supuestos describan una población real. Una muestra grande tampoco elimina selección, mala medición ni confusión. [1, pp. 9, 11 y 24; 2, p. 11]
+
+\clearpage
+\subsection*{Preparar R}
+
+La instalación se hace una sola vez y se separa de los cálculos. Los nueve casos centrales solo requieren pwr. La práctica factorial requiere además pwr2.
+
+\begin{Verbatim}
+install.packages(c("pwr", "knitr", "rmarkdown"))
+# pwr2 1.0 se obtiene del archivo de CRAN.
+install.packages(
+  "https://cran.r-project.org/src/contrib/Archive/pwr2/pwr2_1.0.tar.gz",
+  repos = NULL, type = "source")
+library(pwr)
+library(pwr2)
+\end{Verbatim}
+
+CRAN informa que pwr2 fue archivado el 27 de mayo de 2026 por falta de contacto con el mantenedor. Se conserva la versión 1.0 para reproducir la clase y se documenta su instalación desde el archivo. [7]
+
+Se deja una incógnita en cada llamada: n para calcular muestra; power para calcular potencia con n conocido; o d, h o f para hallar el efecto detectable con n y potencia fijos. El efecto detectable es una cantidad de planificación, no un efecto observado.
+
+
+
+\clearpage
+\section*{E1A · Comparación bilateral}
+\etiqueta{Enunciado}
+En niños de Puno se espera una media posterior de 14 g/dL, frente a una referencia fija de 10 g/dL, con DE esperada de 1 g/dL. Calcule n con alfa de 0,05, potencia de 80 \% y prueba bilateral. En esta adaptación se explicitan unidades g/dL; el enunciado previo decía mg/dL. El cociente d se conserva si media y DE usan coherentemente la misma escala.
+\etiqueta{Por qué este método}
+Evaluamos una media de hemoglobina posterior frente a un valor de referencia fijado en 10 g/dL. Por eso corresponde una t de una muestra. Teoría 01 pide definir población y unidad de análisis; Teoría 02 recuerda que una comparación con referencia histórica, sin control simultáneo, no permite atribuir todo el cambio a la intervención. Aquí 10 se considera fijo: si fuera una media basal estimada en estos mismos niños, habría que plantear un cálculo pareado. [1, pp. 7 y 29; 2, pp. 9 y 11; 3, pp. 30 y 31]
+\etiqueta{Hipótesis y cálculo}
+$H_0: \mu=10$ frente a $H_A: \mu\ne10$.
+
+$d=(\mu_1-\mu_0)/\sigma$
+
+d = (14 \ensuremath{-} 10) / 1 = 4.
+\begin{Verbatim}
+library(pwr)
+media_referencia <- 10
+media_esperada <- 14
+de_esperada <- 1
+d <- (media_esperada - media_referencia) / de_esperada
+calculo <- pwr.t.test(d = d, sig.level = 0.05,
+  power = 0.80, type = "one.sample",
+  alternative = "two.sided")
+calculo$n
+ceiling(calculo$n)
+\end{Verbatim}
+\cajares{R devuelve n = 2,720139; al redondear hacia arriba obtenemos 3. Se requieren 3 personas.}
+El resultado pequeño se explica por d = 4: la diferencia esperada equivale a cuatro desviaciones estándar. Es una respuesta matemática bajo una normalidad y variabilidad supuestas muy exigentes para una muestra de tres. No constituye, por sí sola, una recomendación suficiente para ejecutar un estudio clínico. Las observaciones deben ser independientes y la DE de planificación debe estar fundamentada.
+
+{\small\color{Gray}Con n = 3, la potencia calculada es 90,85 \%. Con n = 2, es 34,28 \%, por debajo del objetivo de 80 \%. Esta comprobación corresponde al método utilizado.}
+\etiqueta{Para comprobar que entendimos}
+¿Por qué no multiplicamos n por dos?
+
+{\small Porque solo se toma una muestra nueva; el valor de 10 g/dL se trata como referencia fija.}
+\clearpage
+\section*{E1B · Hipótesis de incremento}
+\etiqueta{Enunciado}
+En niños de Puno se espera una media posterior de 14 g/dL, frente a una referencia fija de 10 g/dL, con DE esperada de 1 g/dL. Calcule n con alfa de 0,05, potencia de 80 \% y prueba unilateral de incremento. En esta adaptación se explicitan unidades g/dL; el enunciado previo decía mg/dL. El cociente d se conserva si media y DE usan coherentemente la misma escala.
+\etiqueta{Por qué este método}
+Evaluamos una media de hemoglobina posterior frente a un valor de referencia fijado en 10 g/dL. Por eso corresponde una t de una muestra. Teoría 01 pide definir población y unidad de análisis; Teoría 02 recuerda que una comparación con referencia histórica, sin control simultáneo, no permite atribuir todo el cambio a la intervención. Aquí 10 se considera fijo: si fuera una media basal estimada en estos mismos niños, habría que plantear un cálculo pareado. [1, pp. 7 y 29; 2, pp. 9 y 11; 3, pp. 30 y 31]
+\etiqueta{Hipótesis y cálculo}
+$H_0: \mu\le10$ frente a $H_A: \mu>10$. El cálculo usa el límite nulo de 10.
+
+$d=(\mu_1-\mu_0)/\sigma$
+
+d = (14 \ensuremath{-} 10) / 1 = 4.
+\begin{Verbatim}
+library(pwr)
+media_referencia <- 10
+media_esperada <- 14
+de_esperada <- 1
+d <- (media_esperada - media_referencia) / de_esperada
+calculo <- pwr.t.test(d = d, sig.level = 0.05,
+  power = 0.80, type = "one.sample",
+  alternative = "greater")
+calculo$n
+ceiling(calculo$n)
+\end{Verbatim}
+\cajares{R devuelve n = 2,248666; al redondear hacia arriba obtenemos 3. Se requieren 3 personas.}
+La alternativa unilateral se justifica porque la pregunta se definió previamente como incremento. El n sin redondear disminuye respecto de A, pero ambos cálculos terminan en tres niños. Una menor exigencia numérica no implica que siempre cambie el entero final. La dirección no debe elegirse después de observar resultados.
+
+{\small\color{Gray}Con n = 3, la potencia calculada es 99,06 \%. Con n = 2, es 62,38 \%, por debajo del objetivo de 80 \%. Esta comprobación corresponde al método utilizado.}
+\etiqueta{Para comprobar que entendimos}
+¿La palabra incremento obliga siempre a usar una cola?
+
+{\small Hay que establecer la hipótesis antes del estudio. Aquí la variante especifica formalmente una alternativa unilateral; el caso A conserva la convención bilateral de clase.}
+\clearpage
+\section*{E1C · Un incremento menor}
+\etiqueta{Enunciado}
+En niños de Puno se espera una media posterior de 11 g/dL, frente a una referencia fija de 10 g/dL, con DE esperada de 1 g/dL. Calcule n con alfa de 0,05, potencia de 80 \% y prueba bilateral. En esta adaptación se explicitan unidades g/dL; el enunciado previo decía mg/dL. El cociente d se conserva si media y DE usan coherentemente la misma escala.
+\etiqueta{Por qué este método}
+Evaluamos una media de hemoglobina posterior frente a un valor de referencia fijado en 10 g/dL. Por eso corresponde una t de una muestra. Teoría 01 pide definir población y unidad de análisis; Teoría 02 recuerda que una comparación con referencia histórica, sin control simultáneo, no permite atribuir todo el cambio a la intervención. Aquí 10 se considera fijo: si fuera una media basal estimada en estos mismos niños, habría que plantear un cálculo pareado. [1, pp. 7 y 29; 2, pp. 9 y 11; 3, pp. 30 y 31]
+\etiqueta{Hipótesis y cálculo}
+$H_0: \mu=10$ frente a $H_A: \mu\ne10$.
+
+$d=(\mu_1-\mu_0)/\sigma$
+
+d = (11 \ensuremath{-} 10) / 1 = 1.
+\begin{Verbatim}
+library(pwr)
+media_referencia <- 10
+media_esperada <- 11
+de_esperada <- 1
+d <- (media_esperada - media_referencia) / de_esperada
+calculo <- pwr.t.test(d = d, sig.level = 0.05,
+  power = 0.80, type = "one.sample",
+  alternative = "two.sided")
+calculo$n
+ceiling(calculo$n)
+\end{Verbatim}
+\cajares{R devuelve n = 9,937850; al redondear hacia arriba obtenemos 10. Se requieren 10 personas.}
+Al esperar un aumento de solo 1 g/dL, el efecto estandarizado baja de 4 a 1. Con la misma DE, alfa y potencia, se necesitan diez niños: una diferencia menor cuesta más distinguir del ruido. El valor de 11 es una variante didáctica y no una predicción clínica.
+
+{\small\color{Gray}Con n = 10, la potencia calculada es 80,31 \%. Con n = 9, es 74,80 \%, por debajo del objetivo de 80 \%. Esta comprobación corresponde al método utilizado.}
+\etiqueta{Para comprobar que entendimos}
+¿Por qué aumenta n si la DE no cambió?
+
+{\small Porque disminuyó la diferencia relevante y, por tanto, d. Se necesita más información para detectarla.}
+\clearpage
+\section*{E2A · Comparación bilateral con 40 \%}
+\etiqueta{Enunciado}
+En Juliaca se espera reducir la prevalencia de anemia de una referencia fija de 40 \% a 20 \%. Calcule n con alfa de 0,05, potencia de 80 \% y alternativa bilateral.
+\etiqueta{Por qué este método}
+Calculamos la muestra de una evaluación de prevalencia posterior en Juliaca, comparada con una referencia fija de 40 \%. El desenlace de cada niño es binario y se mide una vez para este cálculo. Teoría 01 fundamenta la medición de prevalencia; Teoría 02 ayuda a reconocer que una comparación histórica puede confundirse con cambios ajenos al programa. Si se siguiera a los mismos niños antes y después, necesitaríamos las probabilidades de cambio entre estados. [1, pp. 47 y 50; 2, pp. 9 y 11; 3, pp. 32 y 33]
+\etiqueta{Hipótesis y cálculo}
+$H_0:p=0{,}40$ frente a $H_A:p\ne0{,}40$.
+
+$h=2\arcsin\sqrt{p_1}-2\arcsin\sqrt{p_0}$
+
+h = 2 asin(\ensuremath{\surd}0,20) \ensuremath{-} 2 asin(\ensuremath{\surd}0,40) = -0,442143. Las proporciones se ingresan entre 0 y 1 y el arcoseno se calcula en radianes.
+\begin{Verbatim}
+library(pwr)
+p_referencia <- 0.40
+p_esperada <- 0.20
+h <- ES.h(p_esperada, p_referencia)
+calculo <- pwr.p.test(h = h, sig.level = 0.05,
+  power = 0.80, alternative = "two.sided")
+h
+calculo$n
+ceiling(calculo$n)
+\end{Verbatim}
+\cajares{R devuelve n = 40,149573; al redondear hacia arriba obtenemos 41. Se requieren 41 personas.}
+La reducción esperada es de 20 puntos porcentuales, equivalente a 50 \% en términos relativos. El resultado corresponde a una muestra, pues la referencia no aporta incertidumbre muestral en este planteamiento. pwr utiliza una aproximación basada en la transformación arcoseno; una prueba binomial exacta puede requerir otra muestra.
+
+{\small\color{Gray}Con n = 41, la potencia calculada es 80,82 \%. Con n = 40, es 79,85 \%, por debajo del objetivo de 80 \%. Esta comprobación corresponde al método utilizado.}
+\etiqueta{Para comprobar que entendimos}
+¿Podemos llamar pareado a este cálculo porque dice luego de una intervención?
+
+{\small No. Para un diseño pareado deben observarse los mismos niños y conocerse las probabilidades de pares discordantes; aquí se fijó una referencia externa.}
+\clearpage
+\section*{E2B · Una disminución definida antes}
+\etiqueta{Enunciado}
+En Juliaca se espera reducir la prevalencia de anemia de una referencia fija de 40 \% a 20 \%. Calcule n con alfa de 0,05, potencia de 80 \% y alternativa unilateral de disminución.
+\etiqueta{Por qué este método}
+Calculamos la muestra de una evaluación de prevalencia posterior en Juliaca, comparada con una referencia fija de 40 \%. El desenlace de cada niño es binario y se mide una vez para este cálculo. Teoría 01 fundamenta la medición de prevalencia; Teoría 02 ayuda a reconocer que una comparación histórica puede confundirse con cambios ajenos al programa. Si se siguiera a los mismos niños antes y después, necesitaríamos las probabilidades de cambio entre estados. [1, pp. 47 y 50; 2, pp. 9 y 11; 3, pp. 32 y 33]
+\etiqueta{Hipótesis y cálculo}
+$H_0:p\ge0{,}40$ frente a $H_A:p<0{,}40$. El cálculo usa el límite nulo de 0,40.
+
+$h=2\arcsin\sqrt{p_1}-2\arcsin\sqrt{p_0}$
+
+h = 2 asin(\ensuremath{\surd}0,20) \ensuremath{-} 2 asin(\ensuremath{\surd}0,40) = -0,442143. Las proporciones se ingresan entre 0 y 1 y el arcoseno se calcula en radianes.
+\begin{Verbatim}
+library(pwr)
+p_referencia <- 0.40
+p_esperada <- 0.20
+h <- ES.h(p_esperada, p_referencia)
+calculo <- pwr.p.test(h = h, sig.level = 0.05,
+  power = 0.80, alternative = "less")
+h
+calculo$n
+ceiling(calculo$n)
+\end{Verbatim}
+\cajares{R devuelve n = 31,625855; al redondear hacia arriba obtenemos 32. Se requieren 32 personas.}
+Al concentrar el rechazo en la dirección de disminución, el cálculo exige 32 niños en lugar de 41. h debe conservar su signo negativo y acompañarse de alternative = "less". Esta elección solo es válida si la hipótesis direccional quedó establecida antes de recoger los datos.
+
+{\small\color{Gray}Con n = 32, la potencia calculada es 80,41 \%. Con n = 31, es 79,30 \%, por debajo del objetivo de 80 \%. Esta comprobación corresponde al método utilizado.}
+\etiqueta{Para comprobar que entendimos}
+¿Por qué h es negativo?
+
+{\small Porque calculamos proporción esperada menos referencia en la escala arcoseno, y 0,20 es menor que 0,40.}
+\clearpage
+\section*{E2C · Detectar una reducción menor}
+\etiqueta{Enunciado}
+En Juliaca se espera reducir la prevalencia de anemia de una referencia fija de 40 \% a 30 \%. Calcule n con alfa de 0,05, potencia de 80 \% y alternativa bilateral.
+\etiqueta{Por qué este método}
+Calculamos la muestra de una evaluación de prevalencia posterior en Juliaca, comparada con una referencia fija de 40 \%. El desenlace de cada niño es binario y se mide una vez para este cálculo. Teoría 01 fundamenta la medición de prevalencia; Teoría 02 ayuda a reconocer que una comparación histórica puede confundirse con cambios ajenos al programa. Si se siguiera a los mismos niños antes y después, necesitaríamos las probabilidades de cambio entre estados. [1, pp. 47 y 50; 2, pp. 9 y 11; 3, pp. 32 y 33]
+\etiqueta{Hipótesis y cálculo}
+$H_0:p=0{,}40$ frente a $H_A:p\ne0{,}40$.
+
+$h=2\arcsin\sqrt{p_1}-2\arcsin\sqrt{p_0}$
+
+h = 2 asin(\ensuremath{\surd}0,30) \ensuremath{-} 2 asin(\ensuremath{\surd}0,40) = -0,210159. Las proporciones se ingresan entre 0 y 1 y el arcoseno se calcula en radianes.
+\begin{Verbatim}
+library(pwr)
+p_referencia <- 0.40
+p_esperada <- 0.30
+h <- ES.h(p_esperada, p_referencia)
+calculo <- pwr.p.test(h = h, sig.level = 0.05,
+  power = 0.80, alternative = "two.sided")
+h
+calculo$n
+ceiling(calculo$n)
+\end{Verbatim}
+\cajares{R devuelve n = 177,709631; al redondear hacia arriba obtenemos 178. Se requieren 178 personas.}
+La diferencia se reduce a 10 puntos porcentuales y el valor absoluto de h baja. El cálculo aumenta a 178 niños, aunque se mantiene la misma potencia. No basta con decir que se quiere disminuir la anemia: la magnitud de disminución que interesa detectar determina el esfuerzo de muestreo.
+
+{\small\color{Gray}Con n = 178, la potencia calculada es 80,06 \%. Con n = 177, es 79,84 \%, por debajo del objetivo de 80 \%. Esta comprobación corresponde al método utilizado.}
+\etiqueta{Para comprobar que entendimos}
+¿Se trata de estimar una prevalencia con margen de error?
+
+{\small No. Se planifica un contraste con potencia para una alternativa concreta; no se ha fijado una precisión de intervalo.}
+\clearpage
+\section*{E4A · Dos distritos, una muestra por distrito}
+\etiqueta{Enunciado}
+Compare la prevalencia esperada de anemia en San Juan de Lurigancho, 43 \%, y Villa María del Triunfo, 26 \%. Planifique dos muestras independientes de igual tamaño, alfa de 0,05, potencia de 80 \% y contraste bilateral.
+\etiqueta{Por qué este método}
+Comparamos dos grupos distintos de niños, uno de cada distrito, mediante una medición transversal. Nadie pertenece a ambos grupos y no se asigna una intervención. Según Teoría 01, esta comparación es observacional y estima prevalencias; Teoría 02 permite distinguirla de un ensayo aleatorizado. Se planifica igual cantidad de niños por distrito y observaciones independientes. [1, pp. 29 y 47; 2, p. 7; 3, pp. 36 y 37]
+\etiqueta{Hipótesis y cálculo}
+$H_0:p_{SJL}=p_{VMT}$ frente a $H_A:p_{SJL}\ne p_{VMT}$.
+
+$h=2\arcsin\sqrt{p_{SJL}}-2\arcsin\sqrt{p_{VMT}}$
+
+h = 2 asin(\ensuremath{\surd}0,43) \ensuremath{-} 2 asin(\ensuremath{\surd}0,26) = 0,360193. Se calcula n por distrito y luego N = 2n.
+\begin{Verbatim}
+library(pwr)
+p_sjl <- 0.43
+p_vmt <- 0.26
+h <- ES.h(p_sjl, p_vmt)
+calculo <- pwr.2p.test(h = h, sig.level = 0.05,
+  power = 0.80, alternative = "two.sided")
+n_por_distrito <- ceiling(calculo$n)
+calculo$n
+c(por_distrito = n_por_distrito,
+  total = 2 * n_por_distrito)
+\end{Verbatim}
+\cajares{R devuelve n = 120,994423; al redondear hacia arriba obtenemos 121. Se requieren 121 personas por grupo, equivalentes a 242 participantes en total.}
+Las prevalencias esperadas difieren en 17 puntos porcentuales. El resultado es 121 niños en cada distrito, 242 en total. La asignación 1:1 es un supuesto explícito; si se muestrea por colegios, hogares o centros, la independencia individual puede fallar y habría que ajustar el diseño.
+
+{\small\color{Gray}Con n = 121, la potencia calculada es 80,00 \%. Con n = 120, es 79,68 \%, por debajo del objetivo de 80 \%. Esta comprobación corresponde al método utilizado.}
+\etiqueta{Para comprobar que entendimos}
+¿Por qué no reportamos 121 como total?
+
+{\small Porque pwr.2p.test devuelve n por muestra. Son dos distritos y cada uno requiere 121 niños.}
+\clearpage
+\section*{E4B · Exigir 90 \% de potencia}
+\etiqueta{Enunciado}
+Compare la prevalencia esperada de anemia en San Juan de Lurigancho, 43 \%, y Villa María del Triunfo, 26 \%. Planifique dos muestras independientes de igual tamaño, alfa de 0,05, potencia de 90 \% y contraste bilateral.
+\etiqueta{Por qué este método}
+Comparamos dos grupos distintos de niños, uno de cada distrito, mediante una medición transversal. Nadie pertenece a ambos grupos y no se asigna una intervención. Según Teoría 01, esta comparación es observacional y estima prevalencias; Teoría 02 permite distinguirla de un ensayo aleatorizado. Se planifica igual cantidad de niños por distrito y observaciones independientes. [1, pp. 29 y 47; 2, p. 7; 3, pp. 36 y 37]
+\etiqueta{Hipótesis y cálculo}
+$H_0:p_{SJL}=p_{VMT}$ frente a $H_A:p_{SJL}\ne p_{VMT}$.
+
+$h=2\arcsin\sqrt{p_{SJL}}-2\arcsin\sqrt{p_{VMT}}$
+
+h = 2 asin(\ensuremath{\surd}0,43) \ensuremath{-} 2 asin(\ensuremath{\surd}0,26) = 0,360193. Se calcula n por distrito y luego N = 2n.
+\begin{Verbatim}
+library(pwr)
+p_sjl <- 0.43
+p_vmt <- 0.26
+h <- ES.h(p_sjl, p_vmt)
+calculo <- pwr.2p.test(h = h, sig.level = 0.05,
+  power = 0.90, alternative = "two.sided")
+n_por_distrito <- ceiling(calculo$n)
+calculo$n
+c(por_distrito = n_por_distrito,
+  total = 2 * n_por_distrito)
+\end{Verbatim}
+\cajares{R devuelve n = 161,977545; al redondear hacia arriba obtenemos 162. Se requieren 162 personas por grupo, equivalentes a 324 participantes en total.}
+Mantener las prevalencias y elevar la potencia a 90 \% exige 162 niños por distrito. Se busca reducir la probabilidad de no detectar la diferencia prevista, de 20 \% a 10 \%, bajo el modelo. La potencia no expresa la probabilidad de que H0 sea falsa.
+
+{\small\color{Gray}Con n = 162, la potencia calculada es 90,00 \%. Con n = 161, es 89,83 \%, por debajo del objetivo de 90 \%. Esta comprobación corresponde al método utilizado.}
+\etiqueta{Para comprobar que entendimos}
+¿90 \% de potencia significa 90 \% de probabilidad de que exista una diferencia?
+
+{\small No. Es la probabilidad de rechazar H0 si la diferencia supuesta y el modelo fueran correctos al repetir el estudio.}
+\clearpage
+\section*{E4C · Prevalencias más cercanas}
+\etiqueta{Enunciado}
+Compare la prevalencia esperada de anemia en San Juan de Lurigancho, 43 \%, y Villa María del Triunfo, 33 \%. Planifique dos muestras independientes de igual tamaño, alfa de 0,05, potencia de 80 \% y contraste bilateral.
+\etiqueta{Por qué este método}
+Comparamos dos grupos distintos de niños, uno de cada distrito, mediante una medición transversal. Nadie pertenece a ambos grupos y no se asigna una intervención. Según Teoría 01, esta comparación es observacional y estima prevalencias; Teoría 02 permite distinguirla de un ensayo aleatorizado. Se planifica igual cantidad de niños por distrito y observaciones independientes. [1, pp. 29 y 47; 2, p. 7; 3, pp. 36 y 37]
+\etiqueta{Hipótesis y cálculo}
+$H_0:p_{SJL}=p_{VMT}$ frente a $H_A:p_{SJL}\ne p_{VMT}$.
+
+$h=2\arcsin\sqrt{p_{SJL}}-2\arcsin\sqrt{p_{VMT}}$
+
+h = 2 asin(\ensuremath{\surd}0,43) \ensuremath{-} 2 asin(\ensuremath{\surd}0,33) = 0,206455. Se calcula n por distrito y luego N = 2n.
+\begin{Verbatim}
+library(pwr)
+p_sjl <- 0.43
+p_vmt <- 0.33
+h <- ES.h(p_sjl, p_vmt)
+calculo <- pwr.2p.test(h = h, sig.level = 0.05,
+  power = 0.80, alternative = "two.sided")
+n_por_distrito <- ceiling(calculo$n)
+calculo$n
+c(por_distrito = n_por_distrito,
+  total = 2 * n_por_distrito)
+\end{Verbatim}
+\cajares{R devuelve n = 368,284775; al redondear hacia arriba obtenemos 369. Se requieren 369 personas por grupo, equivalentes a 738 participantes en total.}
+Con 43 \% frente a 33 \%, la diferencia es de 10 puntos porcentuales y se requieren 369 niños por distrito. El aumento frente al caso A muestra que poblaciones más parecidas necesitan muestras mayores para distinguir sus prevalencias.
+
+{\small\color{Gray}Con n = 369, la potencia calculada es 80,08 \%. Con n = 368, es 79,97 \%, por debajo del objetivo de 80 \%. Esta comprobación corresponde al método utilizado.}
+\etiqueta{Para comprobar que entendimos}
+¿La diferencia observada demostraría que vivir en un distrito causa anemia?
+
+{\small No. La comparación es observacional y puede estar afectada por selección, medición y confusión.}
+\clearpage
+
+\subsection*{Comparación de los nueve casos centrales}
+
+\begingroup\small\begin{longtable}{@{}p{16mm}p{105mm}p{17mm}p{17mm}@{}}\toprule
+Caso & Cambio de supuesto & n & Total\\\midrule
+E1A & Media 10 a 14, bilateral & 3 & 3\\
+E1B & Media 10 a 14, unilateral & 3 & 3\\
+E1C & Media 10 a 11, bilateral & 10 & 10\\
+E2A & Prevalencia 40 a 20 \%, bilateral & 41 & 41\\
+E2B & Prevalencia 40 a 20 \%, unilateral & 32 & 32\\
+E2C & Prevalencia 40 a 30 \%, bilateral & 178 & 178\\
+E4A & Distritos 43 y 26 \%, potencia 80 \% & 121 & 242\\
+E4B & Distritos 43 y 26 \%, potencia 90 \% & 162 & 324\\
+E4C & Distritos 43 y 33 \%, potencia 80 \% & 369 & 738\\
+\bottomrule\end{longtable}\endgroup
+
+En E4, n corresponde a cada distrito. En E1 y E2 corresponde a la única muestra nueva. Los resultados no incorporan pérdidas. Detectar una diferencia menor o exigir más potencia aumenta la muestra, manteniendo lo demás fijo. El cambio de dos colas a una puede reducir n sin cambiar siempre el entero final.
+
+\clearpage
+\section*{E3A · Dos medias con DE común}
+\etiqueta{Enunciado}
+Un ensayo paralelo compara una estrategia nutricional con su comparador. Se esperan medias de hemoglobina de 12,5 y 12 g/dL, DE común de 1 g/dL, alfa de 0,05 y potencia de 80 \%. Calcule n por grupo para una prueba bilateral.
+\etiqueta{Por qué este método}
+El protocolo asigna estrategias a dos grupos de niños diferentes. Se plantea aleatorización individual, tal como el esquema de ensayo de Teoría 02; las observaciones son independientes entre grupos. Teoría 01 recuerda que el tamaño muestral y la validez de la comparación son asuntos relacionados pero distintos. Para este ejercicio se supone una DE común, coherente con pwr.t.test. [1, pp. 7 y 9; 2, pp. 12 y 14; 3, pp. 34 y 35]
+\etiqueta{Hipótesis y cálculo}
+$H_0:\mu_I=\mu_C$ frente a $H_A:\mu_I\ne\mu_C$.
+
+$d=(\mu_I-\mu_C)/\sigma$
+
+d = (12,5 \ensuremath{-} 12) / 1 = 0,50.
+\begin{Verbatim}
+library(pwr)
+d <- (12.5 - 12) / 1
+calculo <- pwr.t.test(d = d, sig.level = 0.05,
+  power = 0.80, type = "two.sample",
+  alternative = "two.sided")
+calculo$n
+c(por_grupo = ceiling(calculo$n),
+  total = 2 * ceiling(calculo$n))
+\end{Verbatim}
+\cajares{R devuelve n = 63,765610; al redondear hacia arriba obtenemos 64. Se requieren 64 personas por grupo, equivalentes a 128 participantes en total.}
+El resultado se expresa por grupo. El valor d = 0,5 reproduce el efecto de referencia usado en clase, pero aquí proviene de una diferencia y una DE explícitas. No se está implementando una prueba de Welch para varianzas desiguales.
+
+{\small\color{Gray}Con n = 64, la potencia calculada es 80,15 \%. Con n = 63, es 79,52 \%, por debajo del objetivo de 80 \%. Esta comprobación corresponde al método utilizado.}
+\etiqueta{Para comprobar que entendimos}
+¿Basta con conocer dos desviaciones estándar para calcular n?
+
+{\small También se necesita una diferencia relevante, alfa, potencia, dirección y diseño. Si las varianzas son desiguales, este modelo común debe revisarse.}
+\clearpage
+\section*{E3B · Más potencia para la misma diferencia}
+\etiqueta{Enunciado}
+Un ensayo paralelo compara una estrategia nutricional con su comparador. Se esperan medias de hemoglobina de 12,5 y 12 g/dL, DE común de 1 g/dL, alfa de 0,05 y potencia de 90 \%. Calcule n por grupo para una prueba bilateral.
+\etiqueta{Por qué este método}
+El protocolo asigna estrategias a dos grupos de niños diferentes. Se plantea aleatorización individual, tal como el esquema de ensayo de Teoría 02; las observaciones son independientes entre grupos. Teoría 01 recuerda que el tamaño muestral y la validez de la comparación son asuntos relacionados pero distintos. Para este ejercicio se supone una DE común, coherente con pwr.t.test. [1, pp. 7 y 9; 2, pp. 12 y 14; 3, pp. 34 y 35]
+\etiqueta{Hipótesis y cálculo}
+$H_0:\mu_I=\mu_C$ frente a $H_A:\mu_I\ne\mu_C$.
+
+$d=(\mu_I-\mu_C)/\sigma$
+
+d = (12,5 \ensuremath{-} 12) / 1 = 0,50.
+\begin{Verbatim}
+library(pwr)
+d <- (12.5 - 12) / 1
+calculo <- pwr.t.test(d = d, sig.level = 0.05,
+  power = 0.90, type = "two.sample",
+  alternative = "two.sided")
+calculo$n
+c(por_grupo = ceiling(calculo$n),
+  total = 2 * ceiling(calculo$n))
+\end{Verbatim}
+\cajares{R devuelve n = 85,031285; al redondear hacia arriba obtenemos 86. Se requieren 86 personas por grupo, equivalentes a 172 participantes en total.}
+La muestra aumenta porque se exige detectar el mismo efecto con mayor frecuencia en repeticiones hipotéticas del estudio. La mayor potencia no compensa pérdidas selectivas ni errores de medición.
+
+{\small\color{Gray}Con n = 86, la potencia calculada es 90,32 \%. Con n = 85, es 89,99 \%, por debajo del objetivo de 90 \%. Esta comprobación corresponde al método utilizado.}
+\etiqueta{Para comprobar que entendimos}
+¿Basta con conocer dos desviaciones estándar para calcular n?
+
+{\small También se necesita una diferencia relevante, alfa, potencia, dirección y diseño. Si las varianzas son desiguales, este modelo común debe revisarse.}
+\clearpage
+\section*{E3C · Mayor variabilidad entre niños}
+\etiqueta{Enunciado}
+Un ensayo paralelo compara una estrategia nutricional con su comparador. Se esperan medias de hemoglobina de 12,5 y 12 g/dL, DE común de 2 g/dL, alfa de 0,05 y potencia de 80 \%. Calcule n por grupo para una prueba bilateral.
+\etiqueta{Por qué este método}
+El protocolo asigna estrategias a dos grupos de niños diferentes. Se plantea aleatorización individual, tal como el esquema de ensayo de Teoría 02; las observaciones son independientes entre grupos. Teoría 01 recuerda que el tamaño muestral y la validez de la comparación son asuntos relacionados pero distintos. Para este ejercicio se supone una DE común, coherente con pwr.t.test. [1, pp. 7 y 9; 2, pp. 12 y 14; 3, pp. 34 y 35]
+\etiqueta{Hipótesis y cálculo}
+$H_0:\mu_I=\mu_C$ frente a $H_A:\mu_I\ne\mu_C$.
+
+$d=(\mu_I-\mu_C)/\sigma$
+
+d = (12,5 \ensuremath{-} 12) / 2 = 0,25.
+\begin{Verbatim}
+library(pwr)
+d <- (12.5 - 12) / 2
+calculo <- pwr.t.test(d = d, sig.level = 0.05,
+  power = 0.80, type = "two.sample",
+  alternative = "two.sided")
+calculo$n
+c(por_grupo = ceiling(calculo$n),
+  total = 2 * ceiling(calculo$n))
+\end{Verbatim}
+\cajares{R devuelve n = 252,127503; al redondear hacia arriba obtenemos 253. Se requieren 253 personas por grupo, equivalentes a 506 participantes en total.}
+Duplicar la DE, conservando la diferencia de medias, reduce d a la mitad. La muestra aumenta considerablemente. Este caso permite corregir la idea de que una mayor variabilidad exigiría una muestra menor.
+
+{\small\color{Gray}Con n = 253, la potencia calculada es 80,14 \%. Con n = 252, es 79,98 \%, por debajo del objetivo de 80 \%. Esta comprobación corresponde al método utilizado.}
+\etiqueta{Para comprobar que entendimos}
+¿Basta con conocer dos desviaciones estándar para calcular n?
+
+{\small También se necesita una diferencia relevante, alfa, potencia, dirección y diseño. Si las varianzas son desiguales, este modelo común debe revisarse.}
+\clearpage
+\section*{E5A · Cada niño actúa como su propia comparación}
+\etiqueta{Enunciado}
+Se medirá hemoglobina antes y después en los mismos niños. Se espera un cambio medio de 1 g/dL y una DE de las diferencias de 1 g/dL. Calcule el número de pares completos con alfa de 0,05, potencia de 80 \% y alternativa bilateral.
+\etiqueta{Por qué este método}
+Las dos mediciones pertenecen a la misma persona; el dato analizado es su diferencia posterior menos basal. Por eso la prueba es pareada. Un antes y después sin control, discutido en Teoría 02, sigue expuesto a historia y maduración: el pareamiento estadístico no elimina esas amenazas. [1, pp. 7 y 16; 2, pp. 9 y 11; 3, pp. 38 y 39]
+\etiqueta{Hipótesis y cálculo}
+$H_0:\mu_D=0$ frente a $H_A:\mu_D\ne0$.
+
+$d_z=\mu_D/\sigma_D$
+
+d\_z = 1 / 1 = 1,00. Si solo tuviéramos las DE basal y final, necesitaríamos además su correlación para calcular la DE de las diferencias.
+\begin{Verbatim}
+library(pwr)
+de_diferencias <- 1
+dz <- 1 / de_diferencias
+calculo <- pwr.t.test(d = dz, sig.level = 0.05,
+  power = 0.80, type = "paired",
+  alternative = "two.sided")
+calculo$n
+ceiling(calculo$n)
+\end{Verbatim}
+\cajares{R devuelve n = 9,937850; al redondear hacia arriba obtenemos 10. Se requieren 10 pares completos, es decir, 10 personas con dos mediciones cada una.}
+Diez pares completos equivalen a diez niños medidos dos veces, no a veinte participantes. La función usa la misma matemática que una t de una muestra aplicada a las diferencias.
+
+{\small\color{Gray}Con n = 10, la potencia calculada es 80,31 \%. Con n = 9, es 74,80 \%, por debajo del objetivo de 80 \%. Esta comprobación corresponde al método utilizado.}
+\etiqueta{Para comprobar que entendimos}
+¿DE basal igual a DE final implica conocer la DE del cambio?
+
+{\small No. $\sigma_D=\sqrt{\sigma_{antes}^2+\sigma_{despues}^2-2\rho\sigma_{antes}\sigma_{despues}}$. Falta la correlación $\rho$.}
+\clearpage
+\section*{E5B · Diferencias individuales más variables}
+\etiqueta{Enunciado}
+Se medirá hemoglobina antes y después en los mismos niños. Se espera un cambio medio de 1 g/dL y una DE de las diferencias de 2 g/dL. Calcule el número de pares completos con alfa de 0,05, potencia de 80 \% y alternativa bilateral.
+\etiqueta{Por qué este método}
+Las dos mediciones pertenecen a la misma persona; el dato analizado es su diferencia posterior menos basal. Por eso la prueba es pareada. Un antes y después sin control, discutido en Teoría 02, sigue expuesto a historia y maduración: el pareamiento estadístico no elimina esas amenazas. [1, pp. 7 y 16; 2, pp. 9 y 11; 3, pp. 38 y 39]
+\etiqueta{Hipótesis y cálculo}
+$H_0:\mu_D=0$ frente a $H_A:\mu_D\ne0$.
+
+$d_z=\mu_D/\sigma_D$
+
+d\_z = 1 / 2 = 0,50. Si solo tuviéramos las DE basal y final, necesitaríamos además su correlación para calcular la DE de las diferencias.
+\begin{Verbatim}
+library(pwr)
+de_diferencias <- 2
+dz <- 1 / de_diferencias
+calculo <- pwr.t.test(d = dz, sig.level = 0.05,
+  power = 0.80, type = "paired",
+  alternative = "two.sided")
+calculo$n
+ceiling(calculo$n)
+\end{Verbatim}
+\cajares{R devuelve n = 33,367129; al redondear hacia arriba obtenemos 34. Se requieren 34 pares completos, es decir, 34 personas con dos mediciones cada una.}
+Una DE de diferencias mayor reduce el efecto estandarizado y eleva el número de pares. No debemos sustituir la DE de las diferencias por la DE basal o final sin justificación.
+
+{\small\color{Gray}Con n = 34, la potencia calculada es 80,78 \%. Con n = 33, es 79,54 \%, por debajo del objetivo de 80 \%. Esta comprobación corresponde al método utilizado.}
+\etiqueta{Para comprobar que entendimos}
+¿DE basal igual a DE final implica conocer la DE del cambio?
+
+{\small No. $\sigma_D=\sqrt{\sigma_{antes}^2+\sigma_{despues}^2-2\rho\sigma_{antes}\sigma_{despues}}$. Falta la correlación $\rho$.}
+\clearpage
+\section*{E5C · Incremento en datos pareados}
+\etiqueta{Enunciado}
+Se medirá hemoglobina antes y después en los mismos niños. Se espera un cambio medio de 1 g/dL y una DE de las diferencias de 1 g/dL. Calcule el número de pares completos con alfa de 0,05, potencia de 80 \% y alternativa unilateral de incremento.
+\etiqueta{Por qué este método}
+Las dos mediciones pertenecen a la misma persona; el dato analizado es su diferencia posterior menos basal. Por eso la prueba es pareada. Un antes y después sin control, discutido en Teoría 02, sigue expuesto a historia y maduración: el pareamiento estadístico no elimina esas amenazas. [1, pp. 7 y 16; 2, pp. 9 y 11; 3, pp. 38 y 39]
+\etiqueta{Hipótesis y cálculo}
+$H_0:\mu_D\le0$ frente a $H_A:\mu_D>0$.
+
+$d_z=\mu_D/\sigma_D$
+
+d\_z = 1 / 1 = 1,00. Si solo tuviéramos las DE basal y final, necesitaríamos además su correlación para calcular la DE de las diferencias.
+\begin{Verbatim}
+library(pwr)
+de_diferencias <- 1
+dz <- 1 / de_diferencias
+calculo <- pwr.t.test(d = dz, sig.level = 0.05,
+  power = 0.80, type = "paired",
+  alternative = "greater")
+calculo$n
+ceiling(calculo$n)
+\end{Verbatim}
+\cajares{R devuelve n = 7,727618; al redondear hacia arriba obtenemos 8. Se requieren 8 pares completos, es decir, 8 personas con dos mediciones cada una.}
+El cálculo unilateral exige ocho pares bajo estos supuestos. Deben contarse pares completos: una medición aislada no aporta un cambio individual para este análisis.
+
+{\small\color{Gray}Con n = 8, la potencia calculada es 81,50 \%. Con n = 7, es 75,44 \%, por debajo del objetivo de 80 \%. Esta comprobación corresponde al método utilizado.}
+\etiqueta{Para comprobar que entendimos}
+¿DE basal igual a DE final implica conocer la DE del cambio?
+
+{\small No. $\sigma_D=\sqrt{\sigma_{antes}^2+\sigma_{despues}^2-2\rho\sigma_{antes}\sigma_{despues}}$. Falta la correlación $\rho$.}
+\clearpage
+\section*{E6A · Un efecto global de referencia}
+\etiqueta{Enunciado}
+Un estudio compara tres estrategias educativas mediante un puntaje continuo. Planifique grupos iguales, alfa de 0,05 y potencia de 80 \%. Use f = 0,25 como supuesto de planificación.
+\etiqueta{Por qué este método}
+Hay tres grupos independientes y se evalúa si todas sus medias son iguales. Teoría 02 permite plantearlo como ensayo paralelo si las estrategias se asignan al azar; Teoría 01 exige definir qué se mide y a quién. Se suponen errores normales con varianza común. El contraste F global detecta alguna diferencia, sin identificar por sí solo qué pares difieren. [1, pp. 7 y 29; 2, pp. 12 y 14; 3, pp. 40 y 41]
+\etiqueta{Hipótesis y cálculo}
+$H_0:\mu_1=\mu_2=\mu_3$; $H_A$: al menos una media difiere.
+
+$f=\sqrt{\sum_{j=1}^{k}(\mu_j-\bar\mu)^2/k}\,/\sigma$
+
+f = 0,25 es un supuesto convencional que debe justificarse en un estudio real.
+\begin{Verbatim}
+library(pwr)
+f <- 0.25
+calculo <- pwr.anova.test(k = 3, f = f,
+  sig.level = 0.05, power = 0.80)
+calculo$n
+c(por_grupo = ceiling(calculo$n),
+  total = 3 * ceiling(calculo$n))
+\end{Verbatim}
+\cajares{R devuelve n = 52,396602; al redondear hacia arriba obtenemos 53. Se requieren 53 personas por grupo, equivalentes a 159 participantes en total.}
+f = 0,25 reproduce la elección convencional de clase. No se deriva automáticamente de las medias 50, 60 y 70 y varianza 900. El estadístico F usa una región de rechazo superior; no se introduce alternative = "two.sided".
+
+{\small\color{Gray}Con n = 53, la potencia calculada es 80,49 \%. Con n = 52, es 79,67 \%, por debajo del objetivo de 80 \%. Esta comprobación corresponde al método utilizado.}
+\etiqueta{Para comprobar que entendimos}
+¿Un ANOVA significativo prueba que las tres medias son diferentes entre sí?
+
+{\small No. Permite rechazar que todas sean iguales. Identificar diferencias específicas requiere contrastes adicionales planificados.}
+\clearpage
+\section*{E6B · Más potencia para el contraste global}
+\etiqueta{Enunciado}
+Un estudio compara tres estrategias educativas mediante un puntaje continuo. Planifique grupos iguales, alfa de 0,05 y potencia de 90 \%. Use f = 0,25 como supuesto de planificación.
+\etiqueta{Por qué este método}
+Hay tres grupos independientes y se evalúa si todas sus medias son iguales. Teoría 02 permite plantearlo como ensayo paralelo si las estrategias se asignan al azar; Teoría 01 exige definir qué se mide y a quién. Se suponen errores normales con varianza común. El contraste F global detecta alguna diferencia, sin identificar por sí solo qué pares difieren. [1, pp. 7 y 29; 2, pp. 12 y 14; 3, pp. 40 y 41]
+\etiqueta{Hipótesis y cálculo}
+$H_0:\mu_1=\mu_2=\mu_3$; $H_A$: al menos una media difiere.
+
+$f=\sqrt{\sum_{j=1}^{k}(\mu_j-\bar\mu)^2/k}\,/\sigma$
+
+f = 0,25 es un supuesto convencional que debe justificarse en un estudio real.
+\begin{Verbatim}
+library(pwr)
+f <- 0.25
+calculo <- pwr.anova.test(k = 3, f = f,
+  sig.level = 0.05, power = 0.90)
+calculo$n
+c(por_grupo = ceiling(calculo$n),
+  total = 3 * ceiling(calculo$n))
+\end{Verbatim}
+\cajares{R devuelve n = 68,497073; al redondear hacia arriba obtenemos 69. Se requieren 69 personas por grupo, equivalentes a 207 participantes en total.}
+El incremento de potencia exige 69 personas por grupo. Este es el tamaño para la hipótesis global; varias comparaciones por pares confirmatorias necesitan su propia planificación y control de multiplicidad.
+
+{\small\color{Gray}Con n = 69, la potencia calculada es 90,22 \%. Con n = 68, es 89,77 \%, por debajo del objetivo de 90 \%. Esta comprobación corresponde al método utilizado.}
+\etiqueta{Para comprobar que entendimos}
+¿Un ANOVA significativo prueba que las tres medias son diferentes entre sí?
+
+{\small No. Permite rechazar que todas sean iguales. Identificar diferencias específicas requiere contrastes adicionales planificados.}
+\clearpage
+\section*{E6C · Calcular f desde las medias}
+\etiqueta{Enunciado}
+Un estudio compara tres estrategias educativas mediante un puntaje continuo. Planifique grupos iguales, alfa de 0,05 y potencia de 80 \%. Se esperan medias de 50, 60 y 70 puntos y una DE intragrupo de 30 puntos. Calcule f a partir de ellas.
+\etiqueta{Por qué este método}
+Hay tres grupos independientes y se evalúa si todas sus medias son iguales. Teoría 02 permite plantearlo como ensayo paralelo si las estrategias se asignan al azar; Teoría 01 exige definir qué se mide y a quién. Se suponen errores normales con varianza común. El contraste F global detecta alguna diferencia, sin identificar por sí solo qué pares difieren. [1, pp. 7 y 29; 2, pp. 12 y 14; 3, pp. 40 y 41]
+\etiqueta{Hipótesis y cálculo}
+$H_0:\mu_1=\mu_2=\mu_3$; $H_A$: al menos una media difiere.
+
+$f=\sqrt{\sum_{j=1}^{k}(\mu_j-\bar\mu)^2/k}\,/\sigma$
+
+Media global = 60; variación de las medias = (100 + 0 + 100) / 3. Por tanto, f = \ensuremath{\surd}(200/3) / 30 = 0,272166; no es exactamente 0,25.
+\begin{Verbatim}
+library(pwr)
+f <- sqrt(mean((c(50, 60, 70) - 60)^2)) / 30
+calculo <- pwr.anova.test(k = 3, f = f,
+  sig.level = 0.05, power = 0.80)
+calculo$n
+c(por_grupo = ceiling(calculo$n),
+  total = 3 * ceiling(calculo$n))
+\end{Verbatim}
+\cajares{R devuelve n = 44,370071; al redondear hacia arriba obtenemos 45. Se requieren 45 personas por grupo, equivalentes a 135 participantes en total.}
+El efecto calculado es ligeramente mayor que 0,25 y exige 45 personas por grupo. La comparación ilustra por qué conviene usar parámetros sustantivos en lugar de adoptar una categoría de efecto sin explicación.
+
+{\small\color{Gray}Con n = 45, la potencia calculada es 80,60 \%. Con n = 44, es 79,64 \%, por debajo del objetivo de 80 \%. Esta comprobación corresponde al método utilizado.}
+\etiqueta{Para comprobar que entendimos}
+¿Un ANOVA significativo prueba que las tres medias son diferentes entre sí?
+
+{\small No. Permite rechazar que todas sean iguales. Identificar diferencias específicas requiere contrastes adicionales planificados.}
+\clearpage
+\section*{E7A · Las medias previstas definen el efecto}
+\etiqueta{Enunciado}
+Compare tres programas de rehabilitación usando la distancia recorrida en una prueba funcional. Se esperan medias de 550, 598 y 610 metros, DE común de 80 metros y grupos iguales. Calcule n con alfa de 0,05 y potencia de 80 \%.
+\etiqueta{Por qué este método}
+El desenlace es continuo y procede de tres grupos independientes. El contexto didáctico puede organizarse como ensayo paralelo; la asignación, descrita en Teoría 02, debe distinguirse del muestreo de participantes de Teoría 01. Aquí el ANOVA se parametriza directamente con las medias esperadas y la varianza intragrupo. [1, pp. 7 y 29; 2, pp. 12 y 14; 3, pp. 42 a 44]
+\etiqueta{Hipótesis y cálculo}
+$H_0:\mu_1=\mu_2=\mu_3$; $H_A$: al menos una media difiere.
+
+$f^2=\frac{k-1}{k}\,\frac{s_{\mu}^2}{\sigma^2}$
+
+R calcula var(c(550, 598, 610)) = 1008 usando divisor k \ensuremath{-} 1. La varianza dentro de los grupos es 80\ensuremath{^2} = 6400. El f equivalente es 0,324037; el cociente de medias extremas no es el f del ANOVA.
+\begin{Verbatim}
+medias <- c(550, 598, 610)
+calculo <- power.anova.test(groups = length(medias),
+  between.var = var(medias), within.var = 80^2,
+  sig.level = 0.05, power = 0.80)
+calculo$n
+c(por_grupo = ceiling(calculo$n),
+  total = length(medias) * ceiling(calculo$n))
+\end{Verbatim}
+\cajares{R devuelve n = 31,606600; al redondear hacia arriba obtenemos 32. Se requieren 32 personas por grupo, equivalentes a 96 participantes en total.}
+Se requieren 32 personas por grupo, 96 en total. Usar las tres medias conserva la estructura de la hipótesis global; (610 \ensuremath{-} 550) / 80 = 0,75 describe solo el contraste estandarizado entre extremos.
+
+{\small\color{Gray}Con n = 32, la potencia calculada es 80,53 \%. Con n = 31, es 79,15 \%, por debajo del objetivo de 80 \%. Esta comprobación corresponde al método utilizado.}
+\etiqueta{Para comprobar que entendimos}
+¿Por qué var(medias) y la fórmula de f usan divisores distintos?
+
+{\small var() calcula una varianza con divisor k \ensuremath{-} 1; f pondera las medias poblacionales esperadas con peso 1/k en grupos iguales. El factor (k \ensuremath{-} 1)/k conecta ambas parametrizaciones.}
+\clearpage
+\section*{E7B · Potencia de 90 \% en tres grupos}
+\etiqueta{Enunciado}
+Compare tres programas de rehabilitación usando la distancia recorrida en una prueba funcional. Se esperan medias de 550, 598 y 610 metros, DE común de 80 metros y grupos iguales. Calcule n con alfa de 0,05 y potencia de 90 \%.
+\etiqueta{Por qué este método}
+El desenlace es continuo y procede de tres grupos independientes. El contexto didáctico puede organizarse como ensayo paralelo; la asignación, descrita en Teoría 02, debe distinguirse del muestreo de participantes de Teoría 01. Aquí el ANOVA se parametriza directamente con las medias esperadas y la varianza intragrupo. [1, pp. 7 y 29; 2, pp. 12 y 14; 3, pp. 42 a 44]
+\etiqueta{Hipótesis y cálculo}
+$H_0:\mu_1=\mu_2=\mu_3$; $H_A$: al menos una media difiere.
+
+$f^2=\frac{k-1}{k}\,\frac{s_{\mu}^2}{\sigma^2}$
+
+R calcula var(c(550, 598, 610)) = 1008 usando divisor k \ensuremath{-} 1. La varianza dentro de los grupos es 80\ensuremath{^2} = 6400. El f equivalente es 0,324037; el cociente de medias extremas no es el f del ANOVA.
+\begin{Verbatim}
+medias <- c(550, 598, 610)
+calculo <- power.anova.test(groups = length(medias),
+  between.var = var(medias), within.var = 80^2,
+  sig.level = 0.05, power = 0.90)
+calculo$n
+c(por_grupo = ceiling(calculo$n),
+  total = length(medias) * ceiling(calculo$n))
+\end{Verbatim}
+\cajares{R devuelve n = 41,187943; al redondear hacia arriba obtenemos 42. Se requieren 42 personas por grupo, equivalentes a 126 participantes en total.}
+Al elevar la potencia se requieren 42 personas por grupo. La diferencia esperada y su variabilidad permanecen iguales; el cambio de muestra se debe a la exigencia de detección.
+
+{\small\color{Gray}Con n = 42, la potencia calculada es 90,60 \%. Con n = 41, es 89,86 \%, por debajo del objetivo de 90 \%. Esta comprobación corresponde al método utilizado.}
+\etiqueta{Para comprobar que entendimos}
+¿Por qué var(medias) y la fórmula de f usan divisores distintos?
+
+{\small var() calcula una varianza con divisor k \ensuremath{-} 1; f pondera las medias poblacionales esperadas con peso 1/k en grupos iguales. El factor (k \ensuremath{-} 1)/k conecta ambas parametrizaciones.}
+\clearpage
+\section*{E7C · Una DE intragrupo mayor}
+\etiqueta{Enunciado}
+Compare tres programas de rehabilitación usando la distancia recorrida en una prueba funcional. Se esperan medias de 550, 598 y 610 metros, DE común de 100 metros y grupos iguales. Calcule n con alfa de 0,05 y potencia de 80 \%.
+\etiqueta{Por qué este método}
+El desenlace es continuo y procede de tres grupos independientes. El contexto didáctico puede organizarse como ensayo paralelo; la asignación, descrita en Teoría 02, debe distinguirse del muestreo de participantes de Teoría 01. Aquí el ANOVA se parametriza directamente con las medias esperadas y la varianza intragrupo. [1, pp. 7 y 29; 2, pp. 12 y 14; 3, pp. 42 a 44]
+\etiqueta{Hipótesis y cálculo}
+$H_0:\mu_1=\mu_2=\mu_3$; $H_A$: al menos una media difiere.
+
+$f^2=\frac{k-1}{k}\,\frac{s_{\mu}^2}{\sigma^2}$
+
+R calcula var(c(550, 598, 610)) = 1008 usando divisor k \ensuremath{-} 1. La varianza dentro de los grupos es 100\ensuremath{^2} = 10000. El f equivalente es 0,259230; el cociente de medias extremas no es el f del ANOVA.
+\begin{Verbatim}
+medias <- c(550, 598, 610)
+calculo <- power.anova.test(groups = length(medias),
+  between.var = var(medias), within.var = 100^2,
+  sig.level = 0.05, power = 0.80)
+calculo$n
+c(por_grupo = ceiling(calculo$n),
+  total = length(medias) * ceiling(calculo$n))
+\end{Verbatim}
+\cajares{R devuelve n = 48,803674; al redondear hacia arriba obtenemos 49. Se requieren 49 personas por grupo, equivalentes a 147 participantes en total.}
+La misma separación entre medias es menos clara cuando los participantes varían más dentro de cada grupo. Por eso se requieren 49 personas por grupo. DE = 100 corresponde a varianza = 10000, no a 100.
+
+{\small\color{Gray}Con n = 49, la potencia calculada es 80,17 \%. Con n = 48, es 79,28 \%, por debajo del objetivo de 80 \%. Esta comprobación corresponde al método utilizado.}
+\etiqueta{Para comprobar que entendimos}
+¿Por qué var(medias) y la fórmula de f usan divisores distintos?
+
+{\small var() calcula una varianza con divisor k \ensuremath{-} 1; f pondera las medias poblacionales esperadas con peso 1/k en grupos iguales. El factor (k \ensuremath{-} 1)/k conecta ambas parametrizaciones.}
+\clearpage
+\section*{E8A · Cuatro celdas en un diseño factorial}
+\etiqueta{Enunciado}
+Se evalúan dos intervenciones, A y B, cada una con dos niveles, mediante un puntaje continuo. Suponga un diseño factorial 2 \ensuremath{\times} 2 balanceado y un modelo aditivo sin interacción. Planifique alfa de 0,05 por contraste, f\_A = 0,25 y f\_B = 0,55, con al menos 80 \% de potencia marginal para cada efecto principal.
+\etiqueta{Por qué este método}
+Teoría 02 incluye el diseño factorial: los participantes se distribuyen entre cuatro combinaciones de los factores. Teoría 01 ayuda a diferenciar la exposición del desenlace, que aquí es un puntaje continuo. Se usa el cálculo aditivo implementado en pwr2; no corresponde a una prueba de varias proporciones ni dimensiona una interacción. [1, pp. 7 y 11; 2, p. 14; 3, pp. 45 y 46]
+\etiqueta{Hipótesis y cálculo}
+$H_{0A}$: no hay efecto principal de A; $H_{0B}$: no hay efecto principal de B. Cada alternativa plantea un efecto principal distinto de cero.
+
+$N=abn=4n,\qquad \lambda_A=Nf_A^2,\quad \lambda_B=Nf_B^2$
+
+La función busca el tamaño por celda que satisface la potencia de ambos efectos principales por separado. El menor efecto, f\_A = 0,25, determina el tamaño en estas variantes. En el modelo aditivo se usan N \ensuremath{-} a \ensuremath{-} b + 1 = N \ensuremath{-} 3 grados de libertad residuales.
+\begin{Verbatim}
+library(pwr2)
+calculo <- ss.2way(a = 2, b = 2, alpha = 0.05,
+  beta = 0.20, f.A = 0.25, f.B = 0.55, B = 1000)
+n_celda <- calculo$n
+c(por_celda = n_celda, total = 4 * n_celda)
+pwr.2way(a = 2, b = 2, alpha = 0.05,
+  size.A = n_celda, size.B = n_celda,
+  f.A = 0.25, f.B = 0.55)
+\end{Verbatim}
+\cajares{La búsqueda entera devuelve n = 32 por celda. Se requieren 32 personas por celda, equivalentes a 128 participantes en total.}
+Se requieren 32 personas por celda, 128 en total. El mínimo de las dos potencias marginales no es la probabilidad de detectar ambos efectos simultáneamente. No se ha ajustado el error familiar por dos contrastes ni se ha incluido interacción.
+
+{\small\color{Gray}Con n = 32, la potencia calculada es 80,14 \%. Con n = 31, es 78,87 \%, por debajo del objetivo de 80 \%. Esta comprobación corresponde al método utilizado.}
+\etiqueta{Para comprobar que entendimos}
+¿40 participantes por celda en un diseño 2 \ensuremath{\times} 2 equivalen a 80 en total?
+
+{\small No. Hay cuatro celdas, por lo que son 160. Una potencia de 1,00 en escala de proporción equivale aproximadamente a 100 \%, no a 1 \%.}
+\clearpage
+\section*{E8B · Mayor potencia por efecto principal}
+\etiqueta{Enunciado}
+Se evalúan dos intervenciones, A y B, cada una con dos niveles, mediante un puntaje continuo. Suponga un diseño factorial 2 \ensuremath{\times} 2 balanceado y un modelo aditivo sin interacción. Planifique alfa de 0,05 por contraste, f\_A = 0,25 y f\_B = 0,55, con al menos 90 \% de potencia marginal para cada efecto principal.
+\etiqueta{Por qué este método}
+Teoría 02 incluye el diseño factorial: los participantes se distribuyen entre cuatro combinaciones de los factores. Teoría 01 ayuda a diferenciar la exposición del desenlace, que aquí es un puntaje continuo. Se usa el cálculo aditivo implementado en pwr2; no corresponde a una prueba de varias proporciones ni dimensiona una interacción. [1, pp. 7 y 11; 2, p. 14; 3, pp. 45 y 46]
+\etiqueta{Hipótesis y cálculo}
+$H_{0A}$: no hay efecto principal de A; $H_{0B}$: no hay efecto principal de B. Cada alternativa plantea un efecto principal distinto de cero.
+
+$N=abn=4n,\qquad \lambda_A=Nf_A^2,\quad \lambda_B=Nf_B^2$
+
+La función busca el tamaño por celda que satisface la potencia de ambos efectos principales por separado. El menor efecto, f\_A = 0,25, determina el tamaño en estas variantes. En el modelo aditivo se usan N \ensuremath{-} a \ensuremath{-} b + 1 = N \ensuremath{-} 3 grados de libertad residuales.
+\begin{Verbatim}
+library(pwr2)
+calculo <- ss.2way(a = 2, b = 2, alpha = 0.05,
+  beta = 0.10, f.A = 0.25, f.B = 0.55, B = 1000)
+n_celda <- calculo$n
+c(por_celda = n_celda, total = 4 * n_celda)
+pwr.2way(a = 2, b = 2, alpha = 0.05,
+  size.A = n_celda, size.B = n_celda,
+  f.A = 0.25, f.B = 0.55)
+\end{Verbatim}
+\cajares{La búsqueda entera devuelve n = 43 por celda. Se requieren 43 personas por celda, equivalentes a 172 participantes en total.}
+Se requieren 43 personas por celda para alcanzar al menos 90 \% de potencia marginal en cada efecto principal. Si el objetivo confirmatorio exigiera éxito conjunto o una interacción, sería necesaria otra planificación.
+
+{\small\color{Gray}Con n = 43, la potencia calculada es 90,32 \%. Con n = 42, es 89,64 \%, por debajo del objetivo de 90 \%. Esta comprobación corresponde al método utilizado.}
+\etiqueta{Para comprobar que entendimos}
+¿40 participantes por celda en un diseño 2 \ensuremath{\times} 2 equivalen a 80 en total?
+
+{\small No. Hay cuatro celdas, por lo que son 160. Una potencia de 1,00 en escala de proporción equivale aproximadamente a 100 \%, no a 1 \%.}
+\clearpage
+\section*{E8C · Un efecto principal más pequeño}
+\etiqueta{Enunciado}
+Se evalúan dos intervenciones, A y B, cada una con dos niveles, mediante un puntaje continuo. Suponga un diseño factorial 2 \ensuremath{\times} 2 balanceado y un modelo aditivo sin interacción. Planifique alfa de 0,05 por contraste, f\_A = 0,20 y f\_B = 0,55, con al menos 80 \% de potencia marginal para cada efecto principal.
+\etiqueta{Por qué este método}
+Teoría 02 incluye el diseño factorial: los participantes se distribuyen entre cuatro combinaciones de los factores. Teoría 01 ayuda a diferenciar la exposición del desenlace, que aquí es un puntaje continuo. Se usa el cálculo aditivo implementado en pwr2; no corresponde a una prueba de varias proporciones ni dimensiona una interacción. [1, pp. 7 y 11; 2, p. 14; 3, pp. 45 y 46]
+\etiqueta{Hipótesis y cálculo}
+$H_{0A}$: no hay efecto principal de A; $H_{0B}$: no hay efecto principal de B. Cada alternativa plantea un efecto principal distinto de cero.
+
+$N=abn=4n,\qquad \lambda_A=Nf_A^2,\quad \lambda_B=Nf_B^2$
+
+La función busca el tamaño por celda que satisface la potencia de ambos efectos principales por separado. El menor efecto, f\_A = 0,20, determina el tamaño en estas variantes. En el modelo aditivo se usan N \ensuremath{-} a \ensuremath{-} b + 1 = N \ensuremath{-} 3 grados de libertad residuales.
+\begin{Verbatim}
+library(pwr2)
+calculo <- ss.2way(a = 2, b = 2, alpha = 0.05,
+  beta = 0.20, f.A = 0.20, f.B = 0.55, B = 1000)
+n_celda <- calculo$n
+c(por_celda = n_celda, total = 4 * n_celda)
+pwr.2way(a = 2, b = 2, alpha = 0.05,
+  size.A = n_celda, size.B = n_celda,
+  f.A = 0.20, f.B = 0.55)
+\end{Verbatim}
+\cajares{La búsqueda entera devuelve n = 50 por celda. Se requieren 50 personas por celda, equivalentes a 200 participantes en total.}
+Al reducir f\_A a 0,20 aumenta la exigencia a 50 personas por celda. B = 1000 es el límite de iteraciones de búsqueda de la función, no el número de participantes ni los niveles del factor B; siempre se comprueba la potencia devuelta.
+
+{\small\color{Gray}Con n = 50, la potencia calculada es 80,36 \%. Con n = 49, es 79,56 \%, por debajo del objetivo de 80 \%. Esta comprobación corresponde al método utilizado.}
+\etiqueta{Para comprobar que entendimos}
+¿40 participantes por celda en un diseño 2 \ensuremath{\times} 2 equivalen a 80 en total?
+
+{\small No. Hay cuatro celdas, por lo que son 160. Una potencia de 1,00 en escala de proporción equivale aproximadamente a 100 \%, no a 1 \%.}
+
+\clearpage
+\subsection*{Volver a los ocho ejemplos de clase}
+
+Esta tabla conserva los parámetros originales del QMD, diferenciándolos de los nuevos contextos. La potencia corresponde al n disponible de clase. El efecto detectable usa ese mismo n y potencia de 80 \%; alfa es 0,05.
+
+\begingroup\small\begin{longtable}{@{}p{13mm}p{54mm}p{16mm}p{23mm}p{20mm}p{29mm}@{}}\toprule
+Escenario & Parámetros originales & n entero & n disponible & Potencia & Efecto detectable\\\midrule
+1 & d = 1, una media & 10 & 20 & 98,86 \% & d = 0,6604\\
+2 & 15 \% frente a 10 \% & 341 & 400 & 85,95 \% & h = 0,1401\\
+3 & d = 0,5, dos medias & 64 & 70 & 83,58 \% & d = 0,4769\\
+4 & 50 \% frente a 10 \% & 19 & 20 & 83,46 \% & h = 0,8859\\
+5 & dz = 1, pareado & 10 & 40 & 99,9987 \% & dz = 0,4543\\
+6 & f = 0,25, tres grupos & 53 & 60 & 85,46 \% & f = 0,2333\\
+7 & Medias 550, 598 y 610, DE 80 & 32 & 40 & 89,06 \% & f = 0,2870\\
+8 & fA = 0,25 y fB = 0,55 & 32 & 40 & 88,16 \% & No aplica\\
+\bottomrule\end{longtable}\endgroup
+
+Los tamaños de 3, 4, 6 y 7 son por grupo; el de 8 es por celda y el de 5 es por pares completos. La potencia en 8 es la menor potencia marginal. El efecto del escenario 7 se desarrolla como ampliación: el original calculaba únicamente el contraste de extremos.
+
+El QMD usa 15 \% frente a 10 \%, mientras que Teoría 03 usa 20 \% frente a 10 \%. No deben trasladarse resultados entre ambos enunciados. En el QMD de práctica se puede reproducir cada cálculo y construir una curva de potencia al variar n; un único punto no muestra la relación.
+
+\clearpage
+\subsection*{Precisiones aplicadas a la adaptación}
+
+\textbf{Variabilidad.} La diapositiva 16 de Teoría 03 invierte la relación habitual. A diferencia absoluta fija, mayor DE reduce d y exige más muestra. Las variantes E3C y E7C permiten comprobarlo.
+
+\textbf{Dos medias.} El título original alude a varianzas desiguales, pero el código utiliza pwr.t.test con d = 0,5. Se explicita una DE común; no se presenta ese código como cálculo de Welch.
+
+\textbf{Medias pareadas.} Se declara la DE de las diferencias. Conocer las DE de ambos momentos no basta sin su correlación.
+
+\textbf{ANOVA.} f = 0,25 es una elección convencional, distinta del f derivado de las medias 50, 60, 70 y DE 30. El cociente (610 \ensuremath{-} 550) / 80 tampoco equivale al f global.
+
+\textbf{Factorial.} El título de varias proporciones no corresponde al código. Se explicitan cuatro celdas, desenlace continuo, modelo aditivo y potencias marginales de efectos principales. No se dimensiona una interacción ni se ajusta por multiplicidad. Una potencia de 1,00 como proporción equivale aproximadamente a 100 \%, no a 1 \%.
+
+\textbf{Programación.} Se escribe sig.level completo, se separa instalación y análisis y se reemplaza el gráfico de un punto por una curva. d, h y f se denominan tamaños del efecto. Las salidas se obtienen al ejecutar R y se contrastan con los tamaños enteros.
+
+\clearpage
+\subsection*{Reproducción y alcance}
+
+Ejecute desde TAREA2: source("codigo/ejercicios.R"). resultados\_verificados.csv contiene las 24 variantes, tamaños antes y después del redondeo y potencias en n y n \ensuremath{-} 1. sessionInfo.txt registra R 4.6.1, pwr 1.3-0 y pwr2 1.0. Los QMD generan el tutorial y la práctica en HTML. Esta edición LaTeX/PDF se compila con el LaTeX local del autor, autorizado para esta entrega.
+
+No se redistribuyen los PDF originales del curso. Las fuentes de clase se atribuyen e identifican por páginas; los contextos y variantes añadidos se presentan como ejercicios propios de esta adaptación. Todos los resultados están condicionados a modelos y supuestos, y no demuestran efectos clínicos ni causalidad.
+
+\clearpage
+\subsection*{Fuentes bibliográficas}
+
+[1] Quispe, A. M. (s. f.). Teoría 01: Bioestadística. Material de clase proporcionado por el estudiante. Se utilizan las páginas 7, 9, 11, 16, 24, 29, 47 y 50; numeración del PDF contando la portada.
+
+[2] Quispe, A. M. (s. f.). Teoría 02: Bioestadística. Material de clase proporcionado por el estudiante. Se utilizan las páginas 7 a 14 para diseño experimental, comparación y amenazas al antes y después.
+
+[3] Quispe, A. M. (s. f.). Teoría 03: Bioestadística. Material de clase proporcionado por el estudiante. Páginas 11 a 22: supuestos y fórmulas; 26: funciones; 30 a 46: ejemplos.
+
+[4] Quispe, A. M. (s. f.). Muestra.qmd. Práctica de cálculo de tamaño de muestra proporcionada en clase. Se adaptan sus ocho escenarios y se conservan cálculos de n, potencia y efecto detectable en la práctica ampliada. Las variantes y los contextos añadidos son didácticos.
+
+[5] Champely, S. y colaboradores. pwr, versión 1.3.0. Documentación de pwr.t.test, pwr.p.test, pwr.2p.test, ES.h y pwr.anova.test. \url{https://search.r-project.org/CRAN/refmans/pwr/html/00Index.html}
+
+[6] R Core Team. R, versión 4.6.1. Documentación de power.anova.test. \url{https://stat.ethz.ch/R-manual/R-devel/library/stats/html/power.anova.test.html}
+
+[7] Lu, P., Liu, J. y Koestler, D. pwr2, versión 1.0. Documentación y código de ss.2way y pwr.2way, consultados en la instalación utilizada. Documentación accesible: \url{https://rdrr.io/cran/pwr2/man/ss.2way.html} y \url{https://rdrr.io/cran/pwr2/man/pwr.2way.html} CRAN informa que el paquete fue archivado el 27 de mayo de 2026: \url{https://cran.r-project.org/package=pwr2}
+
+Documentación específica verificada: \url{https://search.r-project.org/CRAN/refmans/pwr/html/pwr.t.test.html} ; \url{https://search.r-project.org/CRAN/refmans/pwr/html/pwr.p.test.html} ; \url{https://search.r-project.org/CRAN/refmans/pwr/html/pwr.2p.test.html} ; \url{https://search.r-project.org/CRAN/refmans/pwr/html/pwr.anova.test.html} .
+
+\end{document}
+
