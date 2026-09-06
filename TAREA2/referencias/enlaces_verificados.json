@@ -1,0 +1,72 @@
+[
+  {
+    "url": "https://search.r-project.org/CRAN/refmans/pwr/html/00Index.html",
+    "status": 200,
+    "url_final": "https://search.r-project.org/CRAN/refmans/pwr/html/00Index.html",
+    "bytes_leidos": 3501,
+    "tipo": "text/html"
+  },
+  {
+    "url": "https://search.r-project.org/CRAN/refmans/pwr/html/pwr.t.test.html",
+    "status": 200,
+    "url_final": "https://search.r-project.org/CRAN/refmans/pwr/html/pwr.t.test.html",
+    "bytes_leidos": 4097,
+    "tipo": "text/html"
+  },
+  {
+    "url": "https://search.r-project.org/CRAN/refmans/pwr/html/pwr.p.test.html",
+    "status": 200,
+    "url_final": "https://search.r-project.org/CRAN/refmans/pwr/html/pwr.p.test.html",
+    "bytes_leidos": 3462,
+    "tipo": "text/html"
+  },
+  {
+    "url": "https://search.r-project.org/CRAN/refmans/pwr/html/pwr.2p.test.html",
+    "status": 200,
+    "url_final": "https://search.r-project.org/CRAN/refmans/pwr/html/pwr.2p.test.html",
+    "bytes_leidos": 3326,
+    "tipo": "text/html"
+  },
+  {
+    "url": "https://search.r-project.org/CRAN/refmans/pwr/html/pwr.anova.test.html",
+    "status": 200,
+    "url_final": "https://search.r-project.org/CRAN/refmans/pwr/html/pwr.anova.test.html",
+    "bytes_leidos": 3199,
+    "tipo": "text/html"
+  },
+  {
+    "url": "https://stat.ethz.ch/R-manual/R-devel/library/stats/html/power.anova.test.html",
+    "status": 200,
+    "url_final": "https://stat.ethz.ch/R-manual/R-devel/library/stats/html/power.anova.test.html",
+    "bytes_leidos": 3773,
+    "tipo": "text/html; charset=UTF-8"
+  },
+  {
+    "url": "https://rdrr.io/cran/pwr2/man/ss.2way.html",
+    "status": 200,
+    "url_final": "https://rdrr.io/cran/pwr2/man/ss.2way.html",
+    "bytes_leidos": 37281,
+    "tipo": "text/html; charset=utf-8"
+  },
+  {
+    "url": "https://rdrr.io/cran/pwr2/man/pwr.2way.html",
+    "status": 200,
+    "url_final": "https://rdrr.io/cran/pwr2/man/pwr.2way.html",
+    "bytes_leidos": 36674,
+    "tipo": "text/html; charset=utf-8"
+  },
+  {
+    "url": "https://cran.r-project.org/package=pwr2",
+    "status": 200,
+    "url_final": "https://cran.r-project.org/web/packages/pwr2/index.html",
+    "bytes_leidos": 1158,
+    "tipo": "text/html"
+  },
+  {
+    "url": "https://cran.r-project.org/src/contrib/Archive/pwr2/pwr2_1.0.tar.gz",
+    "status": 200,
+    "url_final": "https://cran.r-project.org/src/contrib/Archive/pwr2/pwr2_1.0.tar.gz",
+    "bytes_leidos": 4561,
+    "tipo": "application/x-gzip"
+  }
+]

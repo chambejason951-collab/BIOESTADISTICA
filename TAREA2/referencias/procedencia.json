@@ -1,0 +1,54 @@
+[
+  {
+    "fuente": "Teoría 01 - BIOESTADÍSTICA - ANTONIO QUISPE.pdf",
+    "ruta": "semana1/Teoría 01 - BIOESTADÍSTICA - ANTONIO QUISPE.pdf",
+    "paginas": [
+      7,
+      9,
+      11,
+      12,
+      16,
+      24,
+      29,
+      47,
+      50
+    ],
+    "sha256": "a8af6d2844a100c0f6239700bc08ecf967b54dc00bb49e7182a74d8b49a3cc26"
+  },
+  {
+    "fuente": "Teoría 02 - BIOESTADÍSTICA - ANTONIO QUISPE.pdf",
+    "ruta": "semana2/Teoría 02 - BIOESTADÍSTICA - ANTONIO QUISPE.pdf",
+    "paginas": [
+      7,
+      8,
+      9,
+      11,
+      12,
+      14
+    ],
+    "sha256": "53e2567394b71933e0e04058a1186783118868ca95f2dfc8027c9f9fcce5a0f7"
+  },
+  {
+    "fuente": "Teoría 03 - BIOESTADÍSTICA - ANTONIO QUISPE.pdf",
+    "ruta": "semana 3/Teoría 03 - BIOESTADÍSTICA - ANTONIO QUISPE.pdf",
+    "paginas": [
+      11,
+      14,
+      15,
+      16,
+      18,
+      19,
+      21,
+      22,
+      26,
+      30,
+      32,
+      34,
+      38,
+      40,
+      42,
+      45
+    ],
+    "sha256": "5c04b4ca5ff3fe4e15010eb41d2cc70295525ed488a5d583dd0f3a578da0fb9e"
+  }
+]
