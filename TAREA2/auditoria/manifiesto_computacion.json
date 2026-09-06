@@ -1,0 +1,220 @@
+{
+  "schema_version": 1,
+  "claim_id": "TAREA2_24_variantes",
+  "repository": {
+    "commit": "sin_commit_local_al_ejecutar",
+    "dirty": true
+  },
+  "command": "Rscript codigo/ejercicios.R (directorio TAREA2)",
+  "environment": {
+    "software": [
+      "R 4.6.1",
+      "pwr 1.3-0",
+      "pwr2 1.0"
+    ],
+    "hardware": "arm64"
+  },
+  "mathematics": {
+    "assertion_tested": "Cada tamaño entero alcanza la potencia prevista y n-1 no, bajo la función y los supuestos declarados.",
+    "coefficient_domain": "Doble precisión de R, cálculos numéricos deterministas",
+    "conventions": "alfa 0,05; redondeo por unidad antes de obtener N; efecto con signo para alternativas unilaterales",
+    "inputs": [
+      {
+        "id": "E1A",
+        "efecto": "4",
+        "potencia": "0.8",
+        "alternativa": "two.sided"
+      },
+      {
+        "id": "E1B",
+        "efecto": "4",
+        "potencia": "0.8",
+        "alternativa": "greater"
+      },
+      {
+        "id": "E1C",
+        "efecto": "1",
+        "potencia": "0.8",
+        "alternativa": "two.sided"
+      },
+      {
+        "id": "E2A",
+        "efecto": "-0.442143188002954",
+        "potencia": "0.8",
+        "alternativa": "two.sided"
+      },
+      {
+        "id": "E2B",
+        "efecto": "-0.442143188002954",
+        "potencia": "0.8",
+        "alternativa": "less"
+      },
+      {
+        "id": "E2C",
+        "efecto": "-0.210158925277157",
+        "potencia": "0.8",
+        "alternativa": "two.sided"
+      },
+      {
+        "id": "E3A",
+        "efecto": "0.5",
+        "potencia": "0.8",
+        "alternativa": "two.sided"
+      },
+      {
+        "id": "E3B",
+        "efecto": "0.5",
+        "potencia": "0.9",
+        "alternativa": "two.sided"
+      },
+      {
+        "id": "E3C",
+        "efecto": "0.25",
+        "potencia": "0.8",
+        "alternativa": "two.sided"
+      },
+      {
+        "id": "E4A",
+        "efecto": "0.360193297694732",
+        "potencia": "0.8",
+        "alternativa": "two.sided"
+      },
+      {
+        "id": "E4B",
+        "efecto": "0.360193297694732",
+        "potencia": "0.9",
+        "alternativa": "two.sided"
+      },
+      {
+        "id": "E4C",
+        "efecto": "0.206455482817306",
+        "potencia": "0.8",
+        "alternativa": "two.sided"
+      },
+      {
+        "id": "E5A",
+        "efecto": "1",
+        "potencia": "0.8",
+        "alternativa": "two.sided"
+      },
+      {
+        "id": "E5B",
+        "efecto": "0.5",
+        "potencia": "0.8",
+        "alternativa": "two.sided"
+      },
+      {
+        "id": "E5C",
+        "efecto": "1",
+        "potencia": "0.8",
+        "alternativa": "greater"
+      },
+      {
+        "id": "E6A",
+        "efecto": "0.25",
+        "potencia": "0.8",
+        "alternativa": "F global"
+      },
+      {
+        "id": "E6B",
+        "efecto": "0.25",
+        "potencia": "0.9",
+        "alternativa": "F global"
+      },
+      {
+        "id": "E6C",
+        "efecto": "0.272165526975909",
+        "potencia": "0.8",
+        "alternativa": "F global"
+      },
+      {
+        "id": "E7A",
+        "efecto": "0.324037034920393",
+        "potencia": "0.8",
+        "alternativa": "F global"
+      },
+      {
+        "id": "E7B",
+        "efecto": "0.324037034920393",
+        "potencia": "0.9",
+        "alternativa": "F global"
+      },
+      {
+        "id": "E7C",
+        "efecto": "0.259229627936314",
+        "potencia": "0.8",
+        "alternativa": "F global"
+      },
+      {
+        "id": "E8A",
+        "efecto": "0.25",
+        "potencia": "0.8",
+        "alternativa": "efectos principales F"
+      },
+      {
+        "id": "E8B",
+        "efecto": "0.25",
+        "potencia": "0.9",
+        "alternativa": "efectos principales F"
+      },
+      {
+        "id": "E8C",
+        "efecto": "0.2",
+        "potencia": "0.8",
+        "alternativa": "efectos principales F"
+      }
+    ],
+    "bounds": {
+      "casos": 24,
+      "potencia_tolerancia": 1e-07,
+      "comparacion_anova_tolerancia": 0.001
+    },
+    "non_claims": [
+      "No valida los supuestos en una población real.",
+      "No prueba causalidad ni garantiza significación.",
+      "Las proporciones usan arcoseno; no se verifica una prueba binomial exacta.",
+      "El factorial no incluye interacción ni potencia conjunta."
+    ]
+  },
+  "randomness": {
+    "used": false,
+    "generator": "ninguno",
+    "seed": null
+  },
+  "run": {
+    "started_at": "2026-09-06T17:45:51.738579+00:00",
+    "runtime_seconds": 0.2202,
+    "exit_status": 0
+  },
+  "outputs": [
+    {
+      "path": "codigo/ejercicios.R",
+      "sha256": "d13717a52d838f2d106dcd2f03cb7de38330201fe1bf2d8b2eabb4bf0ab77649"
+    },
+    {
+      "path": "resultados/resultados_verificados.csv",
+      "sha256": "09a15f5a2a90e81266df9b4b3509761ddcb069add160b5f4818c5bc887c650a4"
+    },
+    {
+      "path": "resultados/puente_con_clase.csv",
+      "sha256": "2ad4b9721d0b12968b076d540bf1f227e99aa3e6105c74ef541c31f87e1f7578"
+    },
+    {
+      "path": "resultados/sessionInfo.txt",
+      "sha256": "233e50fa051941de4fbd8ab691d541cc7874596395430651a63823920a37494d"
+    }
+  ],
+  "checks": [
+    "24 casos completos",
+    "Potencia en n y en n-1",
+    "Signo y fórmula de ES.h",
+    "Equivalencia de ANOVA a partir de medias y f",
+    "Grados de libertad y no centralidad factorial",
+    "Resultados centrales 3, 41 y 121 por unidad correspondiente"
+  ],
+  "result": "Implementación y afirmaciones numéricas verificadas para las 24 variantes y los modelos indicados.",
+  "residual_risks": [
+    "Supuestos de planificación y aproximaciones de los paquetes.",
+    "pwr2 1.0 está archivado; se conserva para reproducir la clase."
+  ]
+}
